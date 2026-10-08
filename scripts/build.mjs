@@ -636,7 +636,7 @@ ${sections}
   write("data/areas.json", JSON.stringify({ builtAt, medAsOf: MED_AS_OF, categories: categoryLabels, prefs: areas.map((a) => ({ code: a.code, name: a.name, count: a.count })) }));
 
   // sitemap / robots
-  for (const p of ["", "index.html", "search.html", "manga.html", "seido.html", "shisetsu-shurui.html", "shisetsu.html", "jigyo.html", "faq.html"]) {
+  for (const p of ["", "index.html", "search.html", "manga.html", "seido.html", "shisetsu-shurui.html", "shisetsu.html", "jigyo.html", "faq.html", "about.html", "policy.html"]) {
     if (p !== "index.html") urls.unshift(`${SITE_URL}/${p}`);
   }
   const chunks = [];
