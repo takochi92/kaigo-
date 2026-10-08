@@ -3,7 +3,7 @@ import glob, os, subprocess
 HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "sns", "video")
 OUT = HERE
 os.chdir(HERE)
-for ep in ["ep1", "ep2", "ep3", "ep4"]:
+for ep in sorted({os.path.basename(f).split("-")[0] for f in glob.glob("frames/ep*-*.png")}, key=lambda e: int(e[2:])):
     fs = sorted(glob.glob(f"frames/{ep}-*.png"))
     durs = [2.5] + [4.5] * (len(fs) - 2) + [5.0]
     T = 0.4
