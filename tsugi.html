@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>今の状況から「次にやること」がわかる案内｜かいごナビ</title>
+<meta name="description" content="親の様子が心配、退院が近い、認定が出た、家での介護が限界、認知症かも、お金が心配、仕事と両立したい。今の状況を選ぶと、次にやることと相談先がわかります。">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header id="site-header"></header>
+
+<main class="wrap" style="max-width:52em">
+  <h1>今の状況から「次にやること」</h1>
+  <p class="lead">いちばん近い状況を選んでください。次にやることと、相談先がわかります。</p>
+
+  <div class="tiles" id="choices" role="list"></div>
+  <section id="answer" aria-live="polite"></section>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="assets/main.js"></script>
+<script>
+(function () {
+  var S = [
+    { id: "shinpai", t: "親の様子が心配", s: "転ぶ・物忘れ・家事がつらそう", steps: [
+      ["地域包括支援センターに電話する", "親が住んでいる地域のセンターへ。相談は無料で、家族だけでもOK。", "shisetsu.html", "相談窓口の探し方"],
+      ["困っていることをメモする", "いつ・どんなことがあったかを具体的に。かかりつけ医や持病、飲んでいる薬も。"],
+      ["必要なら要介護認定を申請する", "市区町村の窓口へ。センターが代わりに申請してくれることもあります。", "seido.html#flow", "申請の流れ"]
+    ], links: [["まんが第1話", "manga.html#ep1"], ["包括って何をしてくれる？", "yomimono/houkatsu.html"]] },
+    { id: "taiin", t: "入院中・退院が近い", s: "家でみられるか不安", steps: [
+      ["病院の医療相談室に相談する", "「地域医療連携室」「患者支援センター」などの名前のことも。病棟の看護師に聞けば案内してもらえます。"],
+      ["入院中に介護保険を申請する", "結果が出るまで原則30日かかるので早めに。"],
+      ["退院前の打ち合わせをお願いする", "病院・ケアマネ・家族で、家での生活の準備を話し合います。"]
+    ], links: [["退院までのチェックリスト", "yomimono/taiin.html"], ["病院の種類と退院後の行き先", "yomimono/byoin-shurui.html"], ["まんが第4話", "manga.html#ep4"]] },
+    { id: "nintei", t: "要介護の認定が出た", s: "次は何をすればいい？", steps: [
+      ["ケアマネジャーを決める", "要介護1〜5なら居宅介護支援事業所へ。要支援1・2なら地域包括支援センターが担当します。", "search.html?cat=kyotaku", "ケアマネ事業所を探す"],
+      ["困っていること・希望を伝える", "お風呂、トイレ、日中ひとりの時間、家族が休みたい…など、遠慮なく。"],
+      ["ケアプランを作ってサービス開始", "事業所と契約して使い始めます。自己負担は原則1割。", "hiyou.html", "自己負担を計算する"]
+    ], links: [["要介護1で使えるサービス", "yomimono/youkaigo1.html"], ["まんが第2話", "manga.html#ep2"]] },
+    { id: "genkai", t: "家での介護が限界", s: "疲れた・もう無理かも", steps: [
+      ["今の気持ちをケアマネジャーに伝える", "「家族が休みたい」は立派な理由です。ケアプランを見直してもらいましょう。ケアマネがいなければ地域包括支援センターへ。"],
+      ["ショートステイで休む", "数日〜数週間、施設に泊まってもらえます。", "search.html?cat=short", "ショートステイを探す"],
+      ["施設も考える", "特養は原則要介護3以上。見学して比べましょう。", "shisetsu-shurui.html#shisetsu", "施設の比較"]
+    ], links: [["特養の申し込み方", "yomimono/tokuyo.html"], ["まんが第3話", "manga.html#ep3"]], note: "つらくて眠れない、気持ちが落ち込むときは、よりそいホットライン（0120-279-338・24時間）にも相談できます。" },
+    { id: "ninchi", t: "認知症かもしれない", s: "物忘れ・同じ話・怒りっぽい", steps: [
+      ["かかりつけ医か地域包括支援センターに相談", "治療で良くなる病気が隠れていることもあるので、早めの受診を。"],
+      ["受診の誘い方を工夫する", "「健康診断のついでに」など。いやがるときはセンターに相談すると、専門職が訪問してくれることも。"],
+      ["お金や契約の備えを話し合う", "判断力があるうちに、成年後見（任意後見）なども考えておきましょう。"]
+    ], links: [["親が認知症かもと思ったら", "yomimono/ninchisho.html"]], note: "認知症の電話相談：認知症の人と家族の会 0120-294-456（平日10〜15時）" },
+    { id: "okane", t: "お金が心配", s: "介護費・施設代が払えるか", steps: [
+      ["自己負担の目安を知る", "使う回数から1か月の目安を計算できます。", "hiyou.html", "自己負担を計算する"],
+      ["軽減の制度を確認する", "高額介護サービス費、負担限度額認定（施設の食費・部屋代）、医療と介護の合算など。", "seido.html#relief", "負担を軽くする制度"],
+      ["市区町村の窓口か包括に相談する", "所得や預貯金によって使える制度が変わります。"]
+    ], links: [["特養の費用のしくみ", "yomimono/tokuyo.html#hiyou"]] },
+    { id: "shigoto", t: "仕事と両立したい", s: "辞めずに介護を続けたい", steps: [
+      ["会社の人事・総務に相談する", "会社には、介護の制度を個別に説明する義務があります（2025年4月から）。"],
+      ["介護休業を「体制づくり」に使う", "通算93日・3回まで分割。申請・ケアマネとの相談・施設見学に集中して使う。"],
+      ["介護保険のサービスで日常を回す", "デイサービスやヘルパーで、平日の日中を支えてもらう。"]
+    ], links: [["介護休業・介護休暇の使い方", "yomimono/kyugyo.html"]] },
+    { id: "mitori", t: "家で最期を迎えたい", s: "看取り・延命治療のこと", steps: [
+      ["主治医か病院の相談室に希望を伝える", "在宅医（訪問診療）と訪問看護を探してもらえます。"],
+      ["家族と「人生会議」をする", "どこで過ごしたいか、どんな医療を受けたいかを話し合っておきましょう。"],
+      ["連絡の順番を決めておく", "いざというとき、救急車ではなく訪問看護・在宅医に連絡する流れを確認。"]
+    ], links: [["在宅での看取りと人生会議", "yomimono/mitori.html"], ["訪問看護の使い方", "yomimono/houmon-kango.html"]] }
+  ];
+  var choices = document.getElementById("choices"), answer = document.getElementById("answer");
+  choices.innerHTML = S.map(function (x, i) {
+    return '<a class="tile' + (i < 4 ? " find" : "") + '" href="#' + x.id + '" data-id="' + x.id + '" role="listitem"><strong>' + x.t + '</strong><span>' + x.s + '</span></a>';
+  }).join("");
+  function show(id) {
+    var x = S.filter(function (s) { return s.id === id; })[0];
+    if (!x) { answer.innerHTML = ""; return; }
+    answer.innerHTML = '<h2 id="ans">「' + x.t + '」ときに次にやること</h2><ol class="steps">' +
+      x.steps.map(function (s) { return "<li><strong>" + s[0] + "</strong><br>" + s[1] + (s[2] ? ' <a href="' + s[2] + '">' + s[3] + " →</a>" : "") + "</li>"; }).join("") + "</ol>" +
+      (x.note ? '<div class="tip">' + x.note + "</div>" : "") +
+      '<p class="btn-row">' + x.links.map(function (l) { return '<a class="btn secondary" href="' + l[1] + '">' + l[0] + "</a>"; }).join("") + "</p>" +
+      '<p class="muted small">命に関わる緊急のときは119番へ。</p>';
+    [].forEach.call(choices.children, function (c) { c.setAttribute("aria-current", c.getAttribute("data-id") === id ? "true" : "false"); });
+  }
+  choices.addEventListener("click", function (e) {
+    var a = e.target.closest("a[data-id]");
+    if (!a) return;
+    e.preventDefault();
+    history.replaceState(null, "", "#" + a.getAttribute("data-id"));
+    show(a.getAttribute("data-id"));
+    document.getElementById("ans").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  show(location.hash.slice(1));
+})();
+</script>
+</body>
+</html>

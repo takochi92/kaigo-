@@ -334,7 +334,7 @@ details.faq .answer::before {
 
 /* ---------- フォーム ---------- */
 .search-bar { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 18px; }
-input[type="search"], input[type="text"], select, textarea {
+input[type="search"], input[type="text"], input[type="number"], select, textarea {
   font: inherit;
   color: var(--text);
   background: var(--surface);
@@ -479,3 +479,17 @@ details.section .grid { padding: 14px; }
 .yougo .term { padding: 10px 2px; border-bottom: 1px solid var(--line); }
 .yougo dt { font-weight: 700; margin-bottom: 2px; }
 .yougo dd { margin: 0; font-size: .94rem; color: var(--text); }
+
+/* 道具（計算・案内・チェックリスト） */
+.calc-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.calc-grid label { display: flex; flex-direction: column; gap: 4px; font-weight: 700; font-size: .92rem; min-width: 0; }
+.calc-grid input, .calc-grid select { font-weight: 400; width: 100%; }
+.result { margin: 18px 0; padding: 16px; border: 2px solid var(--primary); background: var(--surface); }
+.res-main { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.res-main strong { font-size: 2rem; color: var(--primary); font-variant-numeric: tabular-nums; }
+.meter { height: 12px; background: var(--surface-2); border: 1px solid var(--line); margin-top: 10px; }
+.meter span { display: block; height: 100%; background: var(--leaf); }
+label.check { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--line); }
+label.check:last-child { border-bottom: none; }
+label.check input { width: 22px; height: 22px; flex: none; margin-top: 2px; }
+.tile[aria-current="true"] { background: var(--accent-soft); outline: 3px solid var(--accent); outline-offset: -3px; }

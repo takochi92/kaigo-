@@ -712,7 +712,7 @@ ${parentPages.length ? `<h2>政令指定都市（区ごと）</h2><div class="ch
   // 読みもの（yomimono/）のページもサイトマップに入れる
   const yomi = fs.existsSync(path.join(ROOT, "yomimono")) ? fs.readdirSync(path.join(ROOT, "yomimono")).filter((f) => f.endsWith(".html")).sort().reverse() : [];
   for (const f of yomi) urls.unshift(`${SITE_URL}/yomimono/${f === "index.html" ? "" : f}`);
-  for (const p of ["", "index.html", "search.html", "manga.html", "seido.html", "shisetsu-shurui.html", "shisetsu.html", "jigyo.html", "faq.html", "yougo.html", "about.html", "policy.html"]) {
+  for (const p of ["", "index.html", "search.html", "manga.html", "seido.html", "shisetsu-shurui.html", "shisetsu.html", "jigyo.html", "faq.html", "yougo.html", "tsugi.html", "hiyou.html", "kengaku.html", "about.html", "policy.html"]) {
     if (p !== "index.html") urls.unshift(`${SITE_URL}/${p}`);
   }
   const chunks = [];

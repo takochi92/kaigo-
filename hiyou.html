@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>介護サービスの自己負担 かんたん計算｜要介護度・負担割合・回数から1か月の目安｜かいごナビ</title>
+<meta name="description" content="要介護度・自己負担の割合・デイサービスやホームヘルパーの回数を選ぶだけで、1か月の介護サービスの自己負担の目安と、使える上限（区分支給限度額）までの残りがわかります。">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header id="site-header"></header>
+
+<main class="wrap" style="max-width:52em">
+  <h1>介護サービスの自己負担 かんたん計算</h1>
+  <p class="lead">要介護度と、使いたいサービスの回数を入れると、1か月の自己負担の目安がわかります。</p>
+
+  <form class="card" id="calc" onsubmit="return false">
+    <div class="calc-grid">
+      <label>要介護度
+        <select id="level">
+          <option value="1">要介護1</option><option value="2">要介護2</option><option value="3" selected>要介護3</option><option value="4">要介護4</option><option value="5">要介護5</option>
+        </select>
+      </label>
+      <label>自己負担の割合
+        <select id="ratio"><option value="0.1" selected>1割</option><option value="0.2">2割</option><option value="0.3">3割</option></select>
+      </label>
+      <label>地域（1単位の単価）
+        <select id="price">
+          <option value="10" selected>その他の地域（10円）</option>
+          <option value="10.21">7級地・6級地など（約10.2円）</option>
+          <option value="10.45">5級地・4級地など（約10.5円）</option>
+          <option value="10.84">2級地・3級地など（約10.8円）</option>
+          <option value="11.12">1級地（東京23区など・約11.1円）</option>
+        </select>
+      </label>
+    </div>
+
+    <h2 style="margin-top:20px">使いたいサービス（1週間あたりの回数）</h2>
+    <div class="calc-grid">
+      <label>デイサービス（7〜8時間）<input type="number" id="day" min="0" max="7" value="2" inputmode="numeric"> 回/週</label>
+      <label>ホームヘルパー 身体介護（20〜30分）<input type="number" id="shintai" min="0" max="21" value="2" inputmode="numeric"> 回/週</label>
+      <label>ホームヘルパー 生活援助（20〜45分）<input type="number" id="seikatsu" min="0" max="21" value="1" inputmode="numeric"> 回/週</label>
+      <label>訪問看護（30分〜1時間）<input type="number" id="kango" min="0" max="14" value="1" inputmode="numeric"> 回/週</label>
+      <label>ショートステイ<input type="number" id="short" min="0" max="30" value="0" inputmode="numeric"> 日/月</label>
+      <label>福祉用具レンタル（料金の合計）<input type="number" id="yogu" min="0" step="100" value="0" inputmode="numeric"> 円/月</label>
+    </div>
+  </form>
+
+  <section class="result" id="result" aria-live="polite"></section>
+
+  <div class="note">
+    <strong>この計算について</strong>
+    <ul style="margin:6px 0 0">
+      <li>2024年度介護報酬改定の基本の単位数（デイサービスは通常規模、ショートステイは併設型・多床室、訪問看護は訪問看護ステーション）を使った<strong>おおまかな目安</strong>です。加算・減算、事業所の種類、時間帯などで実際の金額は変わります。</li>
+      <li>デイサービスの食費、ショートステイの食費・滞在費、おむつ代などの<strong>実費は含みません</strong>。</li>
+      <li>1か月は4.3週として計算しています。地域の単価はサービスの種類によって少しずつ違います。</li>
+      <li>正確な金額は、ケアマネジャーに試算してもらいましょう。</li>
+    </ul>
+  </div>
+
+  <p class="btn-row"><a class="btn secondary" href="yomimono/youkaigo1.html">要介護1で使えるサービス</a><a class="btn secondary" href="seido.html#relief">負担を軽くする制度</a><a class="btn secondary" href="search.html?cat=kyotaku">ケアマネ事業所を探す</a></p>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="assets/main.js"></script>
+<script>
+(function () {
+  // 区分支給限度基準額（単位/月）
+  var LIMIT = { 1: 16765, 2: 19705, 3: 27048, 4: 30938, 5: 36217 };
+  // 基本の単位数（2024年度）
+  var DAY = { 1: 658, 2: 777, 3: 900, 4: 1023, 5: 1148 };      // 通所介護 通常規模 7〜8時間
+  var SHORT = { 1: 603, 2: 672, 3: 745, 4: 815, 5: 884 };      // 短期入所生活介護 併設型・多床室（1日）
+  var SHINTAI = 244, SEIKATSU = 179, KANGO = 823;              // 訪問介護 身体20〜30分／生活援助20〜45分／訪問看護30分〜1時間
+  var WEEKS = 4.3;
+  var $ = function (id) { return document.getElementById(id); };
+  var yen = function (n) { return Math.round(n).toLocaleString() + "円"; };
+  var num = function (id) { var v = Number($(id).value); return isFinite(v) && v > 0 ? v : 0; };
+
+  function calc() {
+    var lv = Number($("level").value), ratio = Number($("ratio").value), price = Number($("price").value);
+    var rows = [
+      ["デイサービス", DAY[lv] * num("day") * WEEKS],
+      ["ホームヘルパー（身体介護）", SHINTAI * num("shintai") * WEEKS],
+      ["ホームヘルパー（生活援助）", SEIKATSU * num("seikatsu") * WEEKS],
+      ["訪問看護", KANGO * num("kango") * WEEKS],
+      ["ショートステイ", SHORT[lv] * num("short")],
+      ["福祉用具レンタル", num("yogu") / price]
+    ];
+    var units = rows.reduce(function (s, r) { return s + r[1]; }, 0);
+    var limit = LIMIT[lv];
+    var inside = Math.min(units, limit), over = Math.max(0, units - limit);
+    var total = units * price;
+    var self = inside * price * ratio + over * price;
+    var pct = Math.min(100, Math.round(units / limit * 100));
+    $("result").innerHTML =
+      '<div class="res-main"><span class="muted small">1か月の自己負担の目安</span><strong>' + yen(self) + '</strong><span class="muted small">（サービス費用の総額 約' + yen(total) + '）</span></div>' +
+      '<div class="meter" role="img" aria-label="上限に対する使用割合 ' + pct + '%"><span style="width:' + pct + '%"></span></div>' +
+      '<p class="small" style="margin:6px 0 12px">上限（要介護' + lv + '：' + limit.toLocaleString() + '単位）のうち <strong>' + pct + '%</strong> を使っています。' +
+      (over > 0 ? '<br><strong style="color:var(--accent-text)">上限を約' + Math.round(over).toLocaleString() + '単位こえています。こえた分（約' + yen(over * price) + '）は全額自己負担です。</strong>' :
+        ' あと約' + Math.round(limit - units).toLocaleString() + '単位（約' + yen((limit - units) * price) + '分）使えます。') + '</p>' +
+      '<div class="table-wrap"><table><thead><tr><th>サービス</th><th>単位/月</th><th>自己負担の目安</th></tr></thead><tbody>' +
+      rows.filter(function (r) { return r[1] > 0; }).map(function (r) {
+        return '<tr><td>' + r[0] + '</td><td class="num">' + Math.round(r[1]).toLocaleString() + '</td><td class="num">' + yen(r[1] * price * ratio) + '</td></tr>';
+      }).join("") + '</tbody></table></div>' +
+      (self > 44400 ? '<div class="tip">自己負担が月44,400円（一般的な所得の世帯の上限）をこえる場合は、申請すると「高額介護サービス費」で超えた分が戻ってくることがあります（上限額は所得で変わります）。</div>' : "");
+  }
+  document.getElementById("calc").addEventListener("input", calc);
+  calc();
+})();
+</script>
+</body>
+</html>

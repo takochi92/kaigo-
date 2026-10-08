@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>介護施設・老人ホームの見学チェックリスト｜かいごナビ</title>
+<meta name="description" content="特養・老健・グループホーム・有料老人ホーム・サ高住を見学するときに確認したいことのチェックリスト。費用、医療への対応、職員、食事、退去の条件まで、医療従事者の目線でまとめました。">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header id="site-header"></header>
+
+<main class="wrap" style="max-width:52em">
+  <h1>施設見学のチェックリスト</h1>
+  <p class="lead">見学のときにスマホで開いて、チェックしながら回れます。チェックはこの端末に保存されます。</p>
+
+  <div class="search-bar"><label for="name" class="small muted" style="width:100%">施設名（メモ用）</label><input type="text" id="name" placeholder="例：〇〇の里" autocomplete="off"></div>
+  <div id="list"></div>
+  <p class="btn-row"><button class="btn secondary" type="button" id="reset">チェックを全部消す</button></p>
+
+  <div class="tip"><strong>見学のコツ</strong>
+    <ul style="margin:6px 0 0">
+      <li>できれば<strong>食事の時間帯</strong>に見学する（食事の様子、介助のしかたがわかります）</li>
+      <li>2〜3か所を見比べる。同じチェックリストで比べると違いが見えます</li>
+      <li>本人も一緒に行けるなら、本人の感じ方を大切に</li>
+      <li>体験入居・ショートステイで試せる施設もあります</li>
+    </ul>
+  </div>
+  <p class="btn-row"><a class="btn secondary" href="shisetsu-shurui.html#shisetsu">施設の種類の比較</a><a class="btn secondary" href="yomimono/tokuyo.html">特養の申し込み方</a><a class="btn secondary" href="search.html">施設を探す</a></p>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="assets/main.js"></script>
+<script>
+(function () {
+  var G = [
+    ["費用", ["月額の費用の内訳（介護サービス費・部屋代・食費・管理費・日用品）", "入居一時金・敷金の有無と、退去時に戻るお金", "おむつ代・医療費・理美容代など、月額以外にかかるもの", "負担限度額認定（食費・部屋代の軽減）が使えるか", "値上げされたことがあるか"]],
+    ["医療・看護", ["看護師がいる時間（日中だけか、夜間もいるか）", "対応できる医療的ケア（たんの吸引・胃ろう・インスリン・在宅酸素など）", "協力医療機関はどこか、通院の付き添いはどうなるか", "看取りに対応しているか（実際に看取った例があるか）", "入院したとき、何日まで部屋を確保してもらえるか"]],
+    ["介護・職員", ["夜間の職員の人数", "職員のあいさつ・表情・入居者への話しかけ方", "入浴の回数（週何回か）と方法", "トイレ誘導やおむつ交換のしかた", "職員の入れ替わりが多くないか（長く勤めている人がいるか）"]],
+    ["暮らし・食事", ["食事の内容・味・温かさ、きざみ食やとろみへの対応", "1日の過ごし方、レクリエーション、外出の機会", "面会の時間・ルール", "部屋の広さ・日当たり・におい・清潔さ", "持ち込める家具や私物"]],
+    ["安全・契約", ["身体拘束をしない取り組み・虐待防止の取り組み", "感染症・災害への備え（BCP）", "どんなときに退去を求められるか", "重要事項説明書をもらって説明を受けたか", "苦情の窓口"]]
+  ];
+  var key = "kaigo-kengaku";
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(key) || "{}"); } catch (e) {}
+  var save = function () { try { localStorage.setItem(key, JSON.stringify(state)); } catch (e) {} };
+  var list = document.getElementById("list"), name = document.getElementById("name");
+  name.value = state.name || "";
+  name.addEventListener("input", function () { state.name = name.value; save(); });
+  function render() {
+    list.innerHTML = G.map(function (g, gi) {
+      var done = g[1].filter(function (_, i) { return state[gi + "-" + i]; }).length;
+      return '<h2>' + g[0] + '<span class="count">' + done + "/" + g[1].length + "</span></h2>" +
+        '<div class="card" style="padding:8px 16px">' + g[1].map(function (t, i) {
+          var id = "k" + gi + "-" + i;
+          return '<label class="check" for="' + id + '"><input type="checkbox" id="' + id + '" data-k="' + gi + "-" + i + '"' + (state[gi + "-" + i] ? " checked" : "") + ">" + t + "</label>";
+        }).join("") + "</div>";
+    }).join("");
+  }
+  list.addEventListener("change", function (e) {
+    var k = e.target.getAttribute("data-k");
+    if (!k) return;
+    state[k] = e.target.checked; save(); render();
+  });
+  document.getElementById("reset").addEventListener("click", function () {
+    state = { name: "" }; name.value = ""; save(); render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>
