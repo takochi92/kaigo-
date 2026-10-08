@@ -42,7 +42,12 @@ const PHOTO = {
   living: { file: "living", pos: "45% 50%" },
   kitchen: { file: "kitchen", pos: "60% 50%" },
   hospital: { file: "hospital", pos: "40% 50%" },
-  houkatsu: { file: "houkatsu", pos: "50% 50%" }
+  houkatsu: { file: "houkatsu", pos: "50% 50%" },
+  day: { file: "day", pos: "6% 50%" },
+  rail: { file: "rail", pos: "20% 50%" },
+  night: { file: "night", pos: "50% 50%" },
+  facility: { file: "facility", pos: "50% 50%" },
+  bed: { file: "bed", pos: "60% 50%" }
 };
 
 const BG = {
@@ -161,8 +166,8 @@ const EPISODES = [
       },
       {
         bg: "facility",
-        people: [["hanako", 6], ["sakura", 30]],
-        bubbles: [[52, 4, 45, "見学はいつでもどうぞ。お食事もご覧ください", "off", "say", "施設の職員"]],
+        people: [["hanako", 54], ["sakura", 76]],
+        bubbles: [[2, 4, 50, "見学はいつでもどうぞ。お食事もご覧ください", "off", "say", "施設の職員"]],
         narr: "施設は必ず見学を。費用の総額・医療への対応・看取り・退去の条件を確認しましょう。"
       },
       {
@@ -212,11 +217,21 @@ const EPISODES = [
   }
 ];
 
+// 写真の縦横（JPEGのSOFから読む）
+for (const v of Object.values(PHOTO)) {
+  const b = fs.readFileSync(path.join(ROOT, "assets/manga/bg", v.file + ".jpg"));
+  for (let i = 2; i < b.length; ) {
+    const len = b.readUInt16BE(i + 2);
+    if (b[i + 1] >= 0xc0 && b[i + 1] <= 0xc3) { v.h = b.readUInt16BE(i + 5); v.w = b.readUInt16BE(i + 7); break; }
+    i += 2 + len;
+  }
+}
+
 // ---------------------------------------------------------------- HTML
 
 function panelHtml(panel, i) {
   const svg = PHOTO[panel.bg]
-    ? `<img class="bgphoto" src="assets/manga/bg/${PHOTO[panel.bg].file}.jpg" alt="" width="764" height="507" style="object-position:${PHOTO[panel.bg].pos}" loading="lazy">`
+    ? `<img class="bgphoto" src="assets/manga/bg/${PHOTO[panel.bg].file}.jpg" alt="" width="${PHOTO[panel.bg].w}" height="${PHOTO[panel.bg].h}" style="object-position:${PHOTO[panel.bg].pos}" loading="lazy">`
     : `<svg viewBox="0 0 400 300" aria-hidden="true" preserveAspectRatio="xMidYMid slice">${BG[panel.bg]}</svg>`;
   const actors = panel.people.map(([id, x]) => actor(id, x)).join("");
   const bubbles = panel.bubbles.map(([x, y, w, text, tail, kind, who]) =>
