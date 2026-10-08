@@ -226,7 +226,7 @@ function report(log, date) {
   ];
   if (d.created.length) lines.push("### 作ったファイル", ...d.created.map((f) => `- \`${f.path}\``), "");
   if (d.changed.length) lines.push("### 変更したファイル", ...d.changed.map((f) => `- \`${f.path}\``), "");
-  lines.push(`ダッシュボード: ${SITE_URL}/claude/#${date}`);
+  lines.push("（自動で作成された日報です。翌日の日報が来るとこの Issue は閉じられます）");
   return lines.join("\n");
 }
 

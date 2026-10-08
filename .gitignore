@@ -2,3 +2,5 @@ node_modules/
 dist/
 csv/
 claude-data/
+claude/log.json
+claude/feed.xml

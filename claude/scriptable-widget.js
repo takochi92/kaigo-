@@ -5,11 +5,17 @@
 //  2. Scriptable を開いて右上の ＋ → このファイルの中身をすべて貼り付け → 名前を「Claudeログ」にする
 //  3. ホーム画面を長押し → 左上の ＋ → Scriptable → 小 or 中 を追加
 //  4. 追加したウィジェットを長押し →「ウィジェットを編集」→ Script で「Claudeログ」を選ぶ
-// タップするとダッシュボードが開きます。iOS が15分〜1時間おきに自動で更新します。
+// タップすると GitHub の日報 Issue 一覧が開きます。iOS が15分〜1時間おきに自動で更新します。
+//
+// リポジトリを非公開にした場合:
+//  GitHub → Settings → Developer settings → Fine-grained tokens で、このリポジトリだけ
+//  「Contents: Read-only」のトークンを作り、Scriptable のアプリ内でこのスクリプトを一度実行して貼り付けます
+//  （トークンは iPhone のキーチェーンにだけ保存されます）。
 
 const REPO = "takochi92/kaigo-";
-const LOG_URL = `https://raw.githubusercontent.com/${REPO}/claude-log/log.json`;
-const DASHBOARD = "https://takochi92.github.io/kaigo-/claude/";
+const LOG_URL = `https://api.github.com/repos/${REPO}/contents/log.json?ref=claude-log`;
+const OPEN_URL = `https://github.com/${REPO}/issues?q=${encodeURIComponent('is:issue "Claude 日報" in:title')}`;
+const TOKEN_KEY = "claude-log-github-token";
 
 const C = {
   bg1: new Color("#1a1210"),
@@ -32,9 +38,12 @@ async function loadLog() {
   const fm = FileManager.local();
   const cache = fm.joinPath(fm.cacheDirectory(), "claude-log.json");
   try {
-    const req = new Request(LOG_URL + "?t=" + Date.now());
+    const req = new Request(LOG_URL);
+    req.headers = { Accept: "application/vnd.github.raw+json", "Cache-Control": "no-cache" };
+    if (Keychain.contains(TOKEN_KEY)) req.headers.Authorization = "Bearer " + Keychain.get(TOKEN_KEY);
     req.timeoutInterval = 15;
     const log = await req.loadJSON();
+    if (!log || !log.days) throw new Error((log && log.message) || "log.json を読めません");
     fm.writeString(cache, JSON.stringify(log));
     return log;
   } catch (e) {
@@ -93,7 +102,7 @@ async function build() {
   g.endPoint = new Point(0, 1);
   w.backgroundGradient = g;
   w.setPadding(14, 14, 14, 14);
-  w.url = DASHBOARD;
+  w.url = OPEN_URL;
   w.refreshAfterDate = new Date(Date.now() + 30 * 60 * 1000);
 
   let log;
@@ -145,6 +154,23 @@ async function build() {
   }
   w.addSpacer();
   return w;
+}
+
+// アプリ内で実行したとき：トークンの登録・削除
+if (!config.runsInWidget) {
+  const a = new Alert();
+  a.title = "Claude ログ";
+  a.message = Keychain.contains(TOKEN_KEY)
+    ? "GitHub トークンは登録済みです。"
+    : "リポジトリが非公開なら GitHub トークン（Contents: Read-only）を貼り付けてください。公開のままなら空欄で OK。";
+  a.addSecureTextField("github_pat_…", "");
+  a.addAction("保存してプレビュー");
+  if (Keychain.contains(TOKEN_KEY)) a.addDestructiveAction("トークンを削除");
+  a.addCancelAction("プレビューだけ");
+  const i = await a.presentAlert();
+  const token = a.textFieldValue(0).trim();
+  if (i === 0 && token) Keychain.set(TOKEN_KEY, token);
+  if (i === 1) Keychain.remove(TOKEN_KEY);
 }
 
 const widget = await build();
