@@ -473,3 +473,9 @@ details.section .grid { padding: 14px; }
 }
 .episode .tip ul { margin: 6px 0 10px; padding-left: 1.2em; }
 .episode .tip .btn { min-height: 40px; padding: 6px 12px; font-size: .9rem; }
+
+/* 用語集 */
+.yougo { margin: 0 0 8px; display: grid; gap: 0; border-top: 1px solid var(--line); }
+.yougo .term { padding: 10px 2px; border-bottom: 1px solid var(--line); }
+.yougo dt { font-weight: 700; margin-bottom: 2px; }
+.yougo dd { margin: 0; font-size: .94rem; color: var(--text); }

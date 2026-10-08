@@ -10,6 +10,8 @@
 | `search.html` | 全国の介護事業所・病院検索（都道府県・市区町村・サービス種類・キーワード・現在地から近い順） |
 | `area/〇〇/〇〇〇〇〇.html` | 市区町村ごとの事業所一覧ページ（ビルド時に自動生成。Google検索向け） |
 | `manga.html` | まんがでわかる介護（全4話。`npm run manga` で `scripts/make-manga.mjs` から生成） |
+| `yomimono/` | 読みもの（記事）。`content/articles.mjs` を直して `npm run articles` で作り直す |
+| `yougo.html` | 介護・医療の用語集（`content/glossary.mjs`） |
 | `seido.html` | 介護保険のしくみ |
 | `shisetsu-shurui.html` | 施設・サービスの種類 |
 | `shisetsu.html` | 相談窓口：地域包括支援センターの探し方、全国の電話相談 |

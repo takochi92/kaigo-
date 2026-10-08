@@ -465,7 +465,7 @@ function groupOffices(records) {
 function copyStatic() {
   fs.rmSync(DIST, { recursive: true, force: true });
   fs.mkdirSync(DIST, { recursive: true });
-  const skip = new Set(["CLAUDE.md", "sns", "site.config.json", "dist", "scripts", "node_modules", ".git", ".github", "README.md", "package.json", "package-lock.json", ".gitignore"]);
+  const skip = new Set(["content", "CLAUDE.md", "sns", "site.config.json", "dist", "scripts", "node_modules", ".git", ".github", "README.md", "package.json", "package-lock.json", ".gitignore"]);
   for (const entry of fs.readdirSync(ROOT)) {
     if (skip.has(entry) || entry.startsWith(".")) continue;
     fs.cpSync(path.join(ROOT, entry), path.join(DIST, entry), { recursive: true });
@@ -630,7 +630,8 @@ async function main() {
         body: `<p class="small muted"><a href="../../index.html">トップ</a> › <a href="index.html">${esc(PREFS[pi])}</a> › ${esc(c.name)}</p>
 <h1>${esc(PREFS[pi])}${esc(c.name)}の介護事業所・病院</h1>
 <p class="lead">${c.offices.length}件の介護事業所・施設・医療機関を掲載しています。電話番号をタップするとそのまま電話できます。</p>
-<div class="tip">はじめて介護サービスを使う方は、まず${esc(c.name)}の<strong>地域包括支援センター</strong>か介護保険の窓口に相談しましょう（<a href="../../shisetsu.html">相談窓口の探し方</a>）。要介護の認定を受けた方は、下の「ケアプラン作成（居宅介護支援）」の事業所でケアマネジャーを探せます。</div>
+<div class="tip">はじめて介護サービスを使う方は、まず${esc(c.name)}の<strong>地域包括支援センター</strong>か介護保険の窓口に相談しましょう。要介護の認定を受けた方は、下の「ケアプラン作成（居宅介護支援）」の事業所でケアマネジャーを探せます。
+<div class="btn-row" style="margin-top:8px"><a class="btn" target="_blank" rel="noopener" href="https://www.google.com/search?q=${encodeURIComponent(PREFS[pi] + c.name + " 地域包括支援センター 一覧")}">${esc(c.name)}の地域包括支援センターを探す</a><a class="btn secondary" href="../../yomimono/houkatsu.html">包括って何をしてくれる？</a></div></div>
 <p class="btn-row" style="justify-content:space-between;align-items:center"><span class="small muted">種類を押すと一覧が開きます。</span><a class="btn secondary" href="../../search.html?pref=${pc}&amp;city=${encodeURIComponent(c.slug)}">名前・診療科で探す</a></p>
 ${sections}
 <p class="note">出典：厚生労働省「介護サービス情報公表システム」オープンデータ、厚生労働省「医療情報ネット」オープンデータ（${builtAt} 取得・加工）。内容は公表時点のもので、休止・廃止・移転・診療時間の変更などで変わっている場合があります。利用前に直接ご確認いただくか、<a href="https://www.kaigokensaku.mhlw.go.jp/" target="_blank" rel="noopener">介護サービス情報公表システム</a>・<a href="https://www.iryou.teikyouseido.mhlw.go.jp/" target="_blank" rel="noopener">医療情報ネット（ナビイ）</a>で最新情報をご確認ください。</p>`
@@ -711,7 +712,7 @@ ${parentPages.length ? `<h2>政令指定都市（区ごと）</h2><div class="ch
   // 読みもの（yomimono/）のページもサイトマップに入れる
   const yomi = fs.existsSync(path.join(ROOT, "yomimono")) ? fs.readdirSync(path.join(ROOT, "yomimono")).filter((f) => f.endsWith(".html")).sort().reverse() : [];
   for (const f of yomi) urls.unshift(`${SITE_URL}/yomimono/${f === "index.html" ? "" : f}`);
-  for (const p of ["", "index.html", "search.html", "manga.html", "seido.html", "shisetsu-shurui.html", "shisetsu.html", "jigyo.html", "faq.html", "about.html", "policy.html"]) {
+  for (const p of ["", "index.html", "search.html", "manga.html", "seido.html", "shisetsu-shurui.html", "shisetsu.html", "jigyo.html", "faq.html", "yougo.html", "about.html", "policy.html"]) {
     if (p !== "index.html") urls.unshift(`${SITE_URL}/${p}`);
   }
   const chunks = [];
