@@ -477,6 +477,34 @@ function write(rel, content) {
   fs.writeFileSync(file, content);
 }
 
+// すべてのページに SNS 共有用のタグ（OGP画像など）を足す
+function addShareTags() {
+  const image = `${SITE_URL}/assets/ogp.jpg`;
+  const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
+    e.isDirectory() ? walk(path.join(dir, e.name)) : e.name.endsWith(".html") ? [path.join(dir, e.name)] : []);
+  for (const file of walk(DIST)) {
+    let html = fs.readFileSync(file, "utf8");
+    if (html.includes('property="og:image"')) continue;
+    const rel = path.relative(DIST, file).split(path.sep).join("/");
+    const url = `${SITE_URL}/${rel.replace(/(^|\/)index\.html$/, "$1")}`;
+    const title = (html.match(/<title>([^<]*)<\/title>/) || [])[1] || "かいごナビ";
+    const desc = (html.match(/<meta name="description" content="([^"]*)"/) || [])[1] || "";
+    const tags = [
+      html.includes('property="og:title"') ? "" : `<meta property="og:title" content="${title}">`,
+      html.includes('property="og:description"') || !desc ? "" : `<meta property="og:description" content="${desc}">`,
+      html.includes('property="og:url"') ? "" : `<meta property="og:url" content="${url}">`,
+      html.includes('property="og:type"') ? "" : `<meta property="og:type" content="website">`,
+      `<meta property="og:site_name" content="かいごナビ">`,
+      `<meta property="og:image" content="${image}">`,
+      `<meta property="og:image:width" content="1200">`,
+      `<meta property="og:image:height" content="630">`,
+      `<meta name="twitter:card" content="summary_large_image">`
+    ].filter(Boolean).join("\n");
+    html = html.replace("</head>", tags + "\n</head>");
+    fs.writeFileSync(file, html);
+  }
+}
+
 async function main() {
   copyStatic();
 
@@ -647,6 +675,7 @@ ${sections}
   write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${chunks.map((_, i) => `<sitemap><loc>${SITE_URL}/sitemap-${i + 1}.xml</loc><lastmod>${builtAt}</lastmod></sitemap>`).join("\n")}\n</sitemapindex>\n`);
   write("robots.txt", `User-agent: *\nAllow: /\nSitemap: ${SITE_URL}/sitemap.xml\n`);
   write(".nojekyll", "");
+  addShareTags();
 
   const total = areas.reduce((n, a) => n + a.count, 0);
   console.log(`完了: 事業所 ${total} 件 / ページ ${urls.length} 件 → ${path.relative(ROOT, DIST)}/`);
