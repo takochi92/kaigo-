@@ -7,6 +7,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { ARTICLE_SOURCES } from "../content/article-sources.mjs";
 import { ARTICLES, CATEGORIES } from "../content/articles.mjs";
 import { TERMS } from "../content/glossary.mjs";
 
@@ -54,11 +55,12 @@ for (const a of ARTICLES) {
   const body = `<main class="wrap" style="max-width:48em">
   <p class="small muted"><a href="${up}index.html">トップ</a> › <a href="index.html">読みもの</a> › ${esc(catName[a.cat])}</p>
   <h1>${esc(a.title)}</h1>
-  <p class="small muted">かいごナビ編集部（代表：医療従事者）／${a.date.replace(/^(\d+)-0?(\d+)-0?(\d+)$/, "$1年$2月$3日")}</p>
+  <p class="small muted">かいごナビ編集部／${a.date.replace(/^(\d+)-0?(\d+)-0?(\d+)$/, "$1年$2月$3日")}</p>
   <p class="lead">${esc(a.lead)}</p>
   <div class="tip"><strong>この記事のポイント</strong><ul style="margin:6px 0 0">${a.summary.map((s) => `<li>${esc(s)}</li>`).join("")}</ul></div>
   ${toc ? `<nav class="toc" aria-label="この記事の目次">${toc}</nav>` : ""}
   ${rel(a.body, up)}
+  <h2>参考資料・制度の確認先</h2><ul>${(ARTICLE_SOURCES[a.slug] || []).map(([label, url]) => `<li><a href="${esc(url)}">${esc(label)}</a></li>`).join("")}</ul><p class="small muted">対象条件や手続きは、上記の資料とお住まいの自治体・担当者に確認してください。</p>
   ${a.links?.length ? `<h2>関連ページ</h2><div class="btn-row">${a.links.map(([t, h]) => `<a class="btn secondary" href="${rel(h, up)}">${esc(t)}</a>`).join("")}</div>` : ""}
   ${related.length ? `<h2>同じテーマの読みもの</h2><ul>${related.map((b) => `<li><a href="${b.slug}.html">${esc(b.title)}</a></li>`).join("")}</ul>` : ""}
   <p class="note">この記事は一般的な解説です。制度や手続きは自治体や状況によって異なることがあります。具体的なことは、地域包括支援センター・ケアマネジャー・主治医などにご相談ください。わからない言葉は<a href="${up}yougo.html">用語集</a>で調べられます。</p>
@@ -83,13 +85,13 @@ for (const a of ARTICLES) {
   }).join("\n");
   const toc = CATEGORIES.filter(([id]) => all.some((a) => a.cat === id)).map(([id, name]) => `<a href="#${id}">${esc(name)}</a>`).join("");
   fs.writeFileSync(path.join(ROOT, "yomimono", "index.html"), page({
-    title: "読みもの｜介護の悩みに医療従事者がこたえる｜かいごナビ",
-    description: "地域包括支援センター、要介護1のサービスと費用、認知症、特養の申し込み、介護休業、訪問看護、病院の種類、在宅での看取りなど、介護でよくある悩みに医療従事者がやさしくこたえます。",
+    title: "読みもの｜介護の制度・相談先をやさしく解説｜かいごナビ",
+    description: "地域包括支援センター、要介護1のサービスと費用、認知症、特養の申し込み、介護休業、訪問看護、病院の種類、在宅での看取りなど、介護でよくある悩みに編集部が制度や相談先を案内します。",
     up,
     body: `<main class="wrap">
   <p class="small muted"><a href="${up}index.html">トップ</a> › 読みもの</p>
   <h1>読みもの</h1>
-  <p class="lead">介護でよくある悩みに、医療従事者がやさしくこたえます（全${all.length}本）。わからない言葉は<a href="${up}yougo.html">用語集</a>へ。</p>
+  <p class="lead">介護でよくある悩みに、編集部が制度や相談先を案内します（全${all.length}本）。わからない言葉は<a href="${up}yougo.html">用語集</a>へ。</p>
   <nav class="toc" aria-label="テーマ">${toc}</nav>
   ${sections}
 </main>`
