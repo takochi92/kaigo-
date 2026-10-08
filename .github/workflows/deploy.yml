@@ -26,12 +26,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - id: pages
-        uses: actions/configure-pages@v5
+      # 先に国のデータを取り込んでビルド（Pages が未設定でもデータ取得の成否がわかるように）
       - name: Build (download open data)
         run: node scripts/build.mjs
         env:
-          SITE_URL: ${{ steps.pages.outputs.base_url }}
+          # 独自ドメインにしたらリポジトリの Variables に SITE_URL を設定
+          SITE_URL: ${{ vars.SITE_URL || 'https://takochi92.github.io/kaigo-' }}
+      - name: Summary
+        run: |
+          echo "### ビルド結果" >> "$GITHUB_STEP_SUMMARY"
+          echo "- ページ数: $(find dist -name '*.html' | wc -l)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- サイズ: $(du -sh dist | cut -f1)" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
