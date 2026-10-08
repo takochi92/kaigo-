@@ -33,6 +33,7 @@ const argValue = (name) => {
 const CSV_DIR = argValue("--csv-dir");
 const MED_DIR = argValue("--med-dir");
 const LOCAL = Boolean(CSV_DIR || MED_DIR);
+let MED_AS_OF = "";
 
 const PREFS = [
   "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県",
@@ -248,8 +249,15 @@ async function loadMedicalSources() {
   } else if (!LOCAL) {
     console.log("医療情報ネットのページを取得:", MED_DATA_PAGE);
     const html = decode(await fetchWithRetry(MED_DATA_PAGE));
-    const links = collectLinks(html, MED_DATA_PAGE, /\.(zip|csv)(\?|$)/i);
+    let links = collectLinks(html, MED_DATA_PAGE, /\.(zip|csv)(\?|$)/i);
     if (!links.length) throw new Error("医療情報ネットのデータへのリンクが見つかりませんでした。");
+    // ファイル名の日付（例 _20260601）が最新のものだけを使う
+    const dateOf = (u) => (path.basename(u).match(/(20\d{6})/) || [])[1] || "";
+    const latest = links.map(dateOf).sort().pop();
+    if (latest) {
+      links = links.filter((u) => dateOf(u) === latest);
+      MED_AS_OF = `${latest.slice(0, 4)}-${latest.slice(4, 6)}-${latest.slice(6, 8)}`;
+    }
     console.log(`医療データ ${links.length} ファイルを取得します`);
     for (const url of links) {
       const buf = await fetchWithRetry(url);
@@ -474,11 +482,19 @@ async function main() {
 
   const sources = await loadSources();
   let records = [];
+  // ページには過去の時点のファイルも並ぶため、サービスの種類ごとに最初（最新）のファイルだけを使う
+  const seenServices = new Set();
   for (const { label, buf } of sources) {
     const rows = parseCsv(decode(buf));
     if (rows.length < 2) continue;
     try {
       const rs = normalizeRows(rows, "");
+      const kinds = [...new Set(rs.map((r) => r.service))];
+      if (kinds.length && kinds.every((k) => seenServices.has(k))) {
+        console.log(`  ${path.basename(label)}: 古い時点のファイルのためスキップ`);
+        continue;
+      }
+      kinds.forEach((k) => seenServices.add(k));
       records = records.concat(rs);
       console.log(`  ${path.basename(label)}: ${rs.length} 件`);
     } catch (err) {
@@ -617,7 +633,7 @@ ${sections}
   }));
   urls.push(`${SITE_URL}/area/`);
 
-  write("data/areas.json", JSON.stringify({ builtAt, categories: categoryLabels, prefs: areas.map((a) => ({ code: a.code, name: a.name, count: a.count })) }));
+  write("data/areas.json", JSON.stringify({ builtAt, medAsOf: MED_AS_OF, categories: categoryLabels, prefs: areas.map((a) => ({ code: a.code, name: a.name, count: a.count })) }));
 
   // sitemap / robots
   for (const p of ["", "index.html", "search.html", "manga.html", "seido.html", "shisetsu-shurui.html", "shisetsu.html", "jigyo.html", "faq.html"]) {
