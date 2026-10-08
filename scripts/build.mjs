@@ -18,6 +18,7 @@ import fs from "node:fs";
 import path from "node:path";
 import zlib from "node:zlib";
 import { fileURLToPath } from "node:url";
+import { websiteUrl } from "./website-url.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = path.join(ROOT, "dist");
@@ -161,8 +162,7 @@ function normalizeRows(rows, fallbackService) {
     }
     const lat = Number(get(r, "lat"));
     const lng = Number(get(r, "lng"));
-    let url = get(r, "url");
-    if (url && !/^https?:\/\//i.test(url)) url = /^www\./i.test(url) ? "https://" + url : "";
+    const url = websiteUrl(get(r, "url"));
     out.push({
       pref: pi,
       cityCode,
@@ -347,8 +347,7 @@ function loadMedical(files) {
         city = m ? m[1] : "（市区町村不明）";
       }
       const lat = Number(get(r, "lat")), lng = Number(get(r, "lng"));
-      let url = get(r, "url");
-      if (url && !/^https?:\/\//i.test(url)) url = /^www\./i.test(url) ? "https://" + url : "";
+      const url = websiteUrl(get(r, "url"));
       const id = get(r, "id") || name + address;
       facilities.set(kind + "|" + id, {
         pref: pi, cityCode: cc.length === 5 ? cc : "", city, name, service: kind,
