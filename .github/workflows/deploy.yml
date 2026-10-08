@@ -37,6 +37,9 @@ jobs:
           echo "### ビルド結果" >> "$GITHUB_STEP_SUMMARY"
           echo "- ページ数: $(find dist -name '*.html' | wc -l)" >> "$GITHUB_STEP_SUMMARY"
           echo "- サイズ: $(du -sh dist | cut -f1)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Area list (log)
+        run: |
+          node -e 'const fs=require("fs");for(const f of fs.readdirSync("dist/data/pref").sort()){const d=JSON.parse(fs.readFileSync("dist/data/pref/"+f));console.log(f.slice(0,2),d.pref,d.cities.length+"市区町村",d.cities.slice(0,60).map(c=>c.name+":"+c.slug).join(" "))}'
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

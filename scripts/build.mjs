@@ -638,6 +638,44 @@ ${sections}
       urls.push(canonical);
     }
 
+    // 政令指定都市：区ごとのページをまとめた「市」のページ（例：広島市 → area/34/34100.html）
+    const parents = new Map();
+    for (const c of cities) {
+      const m = c.name.match(/^(.+?市)(.+区)$/);
+      if (!m || !/^\d{5}$/.test(c.code || "")) continue;
+      if (!parents.has(m[1])) parents.set(m[1], []);
+      parents.get(m[1]).push({ ...c, ward: m[2] });
+    }
+    const parentPages = [];
+    for (const [cityName, wards] of parents) {
+      if (wards.length < 2) continue;
+      const minCode = Math.min(...wards.map((w) => Number(w.code)));
+      let slug = String(Math.floor(minCode / 10) * 10).padStart(5, "0");
+      if (cities.some((c) => c.slug === slug)) slug += "w"; // 同じ番号の市区町村ページがあるときは上書きしない
+      const total = wards.reduce((n, w) => n + w.offices.length, 0);
+      const counts = CATEGORIES.map(() => 0);
+      for (const w of wards) for (const o of w.offices) counts[Math.min(...o.cats)]++;
+      const prel = `area/${pc}/${slug}.html`;
+      const pcanon = `${SITE_URL}/${prel}`;
+      parentPages.push({ slug, name: cityName, total });
+      write(prel, page({
+        title: `${PREFS[pi]}${cityName}の介護事業所・病院一覧（区ごと・${total}件）｜かいごナビ`,
+        description: `${PREFS[pi]}${cityName}の介護事業所・病院・診療所${total}件を区ごとに掲載。ケアマネ事業所、訪問介護、訪問看護、デイサービス、特養、グループホーム、病院など。`,
+        canonical: pcanon,
+        depth: 2,
+        body: `<p class="small muted"><a href="../../index.html">トップ</a> › <a href="index.html">${esc(PREFS[pi])}</a> › ${esc(cityName)}</p>
+<h1>${esc(PREFS[pi])}${esc(cityName)}の介護事業所・病院</h1>
+<p class="lead">区を選んでください（全${total}件）。電話番号は各区のページからタップで電話できます。</p>
+<div class="tiles">${wards.map((w, i) => `<a class="tile${i % 2 ? "" : " find"}" href="${esc(w.slug)}.html"><strong>${esc(w.ward)}</strong><span>${w.offices.length}件</span></a>`).join("")}</div>
+<div class="tip">はじめて介護サービスを使う方は、まず住んでいる区の<strong>地域包括支援センター</strong>か、区役所の介護保険の窓口に相談しましょう（<a href="../../shisetsu.html">相談窓口の探し方</a>）。流れは<a href="../../manga.html">まんがでわかる介護</a>でも紹介しています。</div>
+<h2>${esc(cityName)}にある主な事業所・医療機関の数</h2>
+<div class="table-wrap"><table><tbody>${counts.map((n, ci) => n ? `<tr><th>${esc(CATEGORIES[ci][1])}</th><td class="num">${n}件</td></tr>` : "").join("")}</tbody></table></div>
+<p><a class="btn secondary" href="../../search.html?pref=${pc}">${esc(cityName)}の事業所を名前・診療科で探す</a></p>`
+      }));
+      urls.push(pcanon);
+      console.log(`  政令市ページ ${prel} ${cityName}（${wards.length}区・${total}件）`);
+    }
+
     // 都道府県ページ
     const rel = `area/${pc}/index.html`;
     const canonical = `${SITE_URL}/area/${pc}/`;
@@ -649,6 +687,7 @@ ${sections}
       body: `<p class="small muted"><a href="../../index.html">トップ</a> › ${esc(PREFS[pi])}</p>
 <h1>${esc(PREFS[pi])}の介護事業所・病院</h1>
 <p class="lead">市区町村を選んでください（全${offices.length}件）。</p>
+${parentPages.length ? `<h2>政令指定都市（区ごと）</h2><div class="chips">${parentPages.map((c) => `<a class="chip" href="${esc(c.slug)}.html">${esc(c.name)}（${c.total}）</a>`).join("")}</div><h2>市区町村</h2>` : ""}
 <div class="chips">${cities.map((c) => `<a class="chip" href="${esc(c.slug)}.html">${esc(c.name)}（${c.offices.length}）</a>`).join("")}</div>
 <p><a class="btn secondary" href="../../search.html?pref=${pc}">${esc(PREFS[pi])}の事業所を名前で検索</a></p>`
     }));
