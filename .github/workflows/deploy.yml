@@ -23,6 +23,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Claude の作業ログ用に全ブランチの履歴を取得
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -31,6 +34,10 @@ jobs:
         run: node scripts/build.mjs
         env:
           # 独自ドメインにしたらリポジトリの Variables に SITE_URL を設定
+          SITE_URL: ${{ vars.SITE_URL || 'https://takochi92.github.io/kaigo-' }}
+      - name: Claude 作業ログ
+        run: node scripts/claude-log.mjs --out dist/claude
+        env:
           SITE_URL: ${{ vars.SITE_URL || 'https://takochi92.github.io/kaigo-' }}
       - name: Summary
         run: |

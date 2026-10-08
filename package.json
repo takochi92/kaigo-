@@ -8,6 +8,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "manga": "node scripts/make-manga.mjs",
+    "claude-log": "node scripts/claude-log.mjs --out dist/claude",
     "serve": "python3 -m http.server 8000 -d dist"
   }
 }
