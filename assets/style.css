@@ -72,12 +72,11 @@ img { max-width: 100%; }
   margin-right: auto;
 }
 .logo-mark {
-  width: 32px; height: 32px;
-  border-radius: 0;
-  background: var(--primary);
-  color: var(--primary-ink);
-  display: grid; place-items: center;
-  font-size: 1rem;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  display: block;
+  object-fit: contain;
 }
 .nav-toggle {
   display: none;

@@ -33,7 +33,7 @@
     header.className = "site-header";
     header.innerHTML =
       '<a class="skip-link" href="#main-content">本文へ移動</a><div class="wrap">' +
-      '<a class="logo" href="' + base + 'index.html"><span class="logo-mark" aria-hidden="true">手</span>おやのて</a>' +
+      '<a class="logo" href="' + base + 'index.html"><img class="logo-mark" src="' + base + 'assets/oyanote-icon.png" alt="" width="40" height="40">おやのて</a>' +
       '<button class="font-btn" id="font-btn" type="button" aria-pressed="false">文字 大</button>' +
       '<button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">メニュー</button>' +
       '<nav class="site-nav" id="site-nav" aria-label="メインメニュー">' + nav + "</nav>" +
