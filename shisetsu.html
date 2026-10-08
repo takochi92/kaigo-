@@ -3,29 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>相談先・施設一覧｜かいごナビ</title>
-<meta name="description" content="地域包括支援センター、居宅介護支援事業所、特養、グループホーム、サ高住などの住所・電話番号一覧。タップで電話、地図表示ができます。">
+<title>介護の相談窓口・地域包括支援センターの探し方｜かいごナビ</title>
+<meta name="description" content="介護の相談はどこにする？地域包括支援センターの探し方と、認知症・介護疲れなど全国の電話相談窓口をまとめました。">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 <header id="site-header"></header>
 
 <main class="wrap">
-  <h1>相談先・施設一覧</h1>
-  <p class="lead">電話番号をタップするとそのまま電話できます。住所の「地図」から場所を確認できます。</p>
+  <h1>相談窓口</h1>
+  <p class="lead">介護の相談は、まず「地域包括支援センター」へ。どこに連絡すればいいかわからないときの探し方と、全国の電話相談窓口をまとめました。</p>
 
-  <div class="note" id="sample-note">
-    <strong>※「サンプル」と表示されている施設は、表示確認用の架空データです。</strong>
-    実際の施設を探すときは、<a href="https://www.kaigokensaku.mhlw.go.jp/" target="_blank" rel="noopener">介護サービス情報公表システム（厚生労働省）</a>や、市区町村のホームページをご利用ください。
+  <h2>地域包括支援センターの探し方</h2>
+  <ol class="steps">
+    <li><strong>市区町村のホームページで探す</strong><br>「〇〇市 地域包括支援センター」で検索すると、担当地区ごとの一覧が見つかります。自治体によって「高齢者あんしんセンター」「高齢者相談センター」などの名前のこともあります。</li>
+    <li><strong>市区町村の介護保険窓口に電話する</strong><br>住所を伝えれば、担当のセンターを教えてもらえます。</li>
+    <li><strong>介護サービス情報公表システムで探す</strong><br><a href="https://www.kaigokensaku.mhlw.go.jp/" target="_blank" rel="noopener">厚生労働省のサイト</a>で、都道府県を選んで「地域包括支援センター」を検索できます。</li>
+  </ol>
+  <div class="tip">要介護認定を受けた方のケアマネジャー探しや、デイサービス・訪問看護・施設などは <a href="search.html">全国の事業所検索</a> から探せます。</div>
+
+  <h2>全国の電話相談・公式サイト</h2>
+  <div class="search-bar" role="search" hidden>
+    <input type="search" id="q" aria-label="キーワード">
   </div>
-
-  <div class="search-bar" role="search">
-    <label class="muted small" for="q" style="width:100%">キーワード（施設名・地区・住所）</label>
-    <input type="search" id="q" placeholder="例：中央、北町、グループホーム" autocomplete="off">
-  </div>
-  <div class="chips" id="chips" aria-label="種類で絞り込み"></div>
-  <p class="muted small" id="count" aria-live="polite"></p>
-
+  <div class="chips" id="chips" hidden></div>
+  <p class="muted small" id="count" hidden></p>
   <div class="grid" id="list"></div>
 
   <h2>電話する前に準備しておくとスムーズなこと</h2>

@@ -1,0 +1,47 @@
+# 国の介護事業所オープンデータを取り込んでサイトをビルドし、GitHub Pages に公開する
+name: Build and deploy
+
+on:
+  push:
+    branches: [ccr-0d9e948d-9nfoh6, main]
+  schedule:
+    # 毎月5日 3:17（日本時間 12:17）に最新データで再ビルド
+    - cron: "17 3 5 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - id: pages
+        uses: actions/configure-pages@v5
+      - name: Build (download open data)
+        run: node scripts/build.mjs
+        env:
+          SITE_URL: ${{ steps.pages.outputs.base_url }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

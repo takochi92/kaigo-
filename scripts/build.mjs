@@ -1,0 +1,463 @@
+#!/usr/bin/env node
+// かいごナビ ビルドスクリプト（依存パッケージなし・Node.js 20 以上）
+//
+// 1. 厚生労働省「介護サービス情報公表システム」オープンデータのCSVを取得
+// 2. 全国の事業所データを都道府県ごとのJSONに整形
+// 3. 都道府県・市区町村ごとの静的ページ（検索エンジン向け）と sitemap.xml を生成
+// 4. サイト一式を dist/ に出力
+//
+// 使い方:
+//   node scripts/build.mjs                      … 厚労省サイトからCSVを取得してビルド
+//   node scripts/build.mjs --csv-dir ./csv      … 手元のCSVフォルダからビルド
+//   SITE_URL=https://example.com node scripts/build.mjs   … sitemap 等に使う公開URL
+
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const DIST = path.join(ROOT, "dist");
+const OPEN_DATA_PAGE = "https://www.mhlw.go.jp/stf/kaigo-kouhyou_opendata.html";
+const SITE_URL = (process.env.SITE_URL || "https://takochi92.github.io/kaigo-").replace(/\/$/, "");
+
+const args = process.argv.slice(2);
+const argValue = (name) => {
+  const i = args.indexOf(name);
+  return i === -1 ? null : args[i + 1];
+};
+const CSV_DIR = argValue("--csv-dir");
+
+const PREFS = [
+  "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県",
+  "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県",
+  "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県",
+  "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県",
+  "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"
+];
+const prefCode = (i) => String(i + 1).padStart(2, "0");
+
+// サービス名 → 表示用カテゴリ（上から順に判定）
+const CATEGORIES = [
+  ["kyotaku", "ケアプラン作成（居宅介護支援）", /居宅介護支援|介護予防支援/],
+  ["houkan", "訪問看護", /訪問看護/],
+  ["houmon", "訪問介護・訪問入浴・訪問リハ", /訪問介護|訪問入浴|訪問リハ|夜間対応型|定期巡回/],
+  ["shokibo", "小規模多機能", /小規模多機能/],
+  ["gh", "グループホーム", /認知症対応型共同生活|共同生活介護/],
+  ["tsusho", "デイサービス・デイケア", /通所|認知症対応型通所/],
+  ["short", "ショートステイ", /短期入所/],
+  ["tokuyo", "特別養護老人ホーム", /介護老人福祉施設|特別養護/],
+  ["rouken", "介護老人保健施設", /介護老人保健施設/],
+  ["iryoin", "介護医療院", /介護医療院|介護療養/],
+  ["tokutei", "有料老人ホーム・ケアハウス等（特定施設）", /特定施設|有料老人|軽費|ケアハウス|サービス付き/],
+  ["yogu", "福祉用具", /福祉用具/],
+  ["other", "その他", /.*/]
+];
+const categoryOf = (service) => CATEGORIES.findIndex(([, , re]) => re.test(service));
+
+// ---------------------------------------------------------------- CSV
+
+function decode(buf) {
+  if (buf[0] === 0xef && buf[1] === 0xbb && buf[2] === 0xbf) return buf.subarray(3).toString("utf8");
+  try {
+    return new TextDecoder("utf-8", { fatal: true }).decode(buf);
+  } catch {
+    return new TextDecoder("shift_jis").decode(buf);
+  }
+}
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [];
+  let field = "";
+  let quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; } else quoted = false;
+      } else field += c;
+    } else if (c === '"') quoted = true;
+    else if (c === ",") { row.push(field); field = ""; }
+    else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(field); field = "";
+      if (row.length > 1 || row[0] !== "") rows.push(row);
+      row = [];
+    } else field += c;
+  }
+  if (field !== "" || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+// 列名の表記ゆれに対応して列番号を探す
+function columnIndex(header, candidates) {
+  const norm = header.map((h) => h.replace(/\s|　/g, ""));
+  for (const c of candidates) {
+    const i = norm.indexOf(c);
+    if (i !== -1) return i;
+  }
+  for (const c of candidates) {
+    const i = norm.findIndex((h) => h.includes(c));
+    if (i !== -1) return i;
+  }
+  return -1;
+}
+
+const COLUMNS = {
+  code: ["都道府県コード又は市区町村コード", "市区町村コード", "都道府県コード"],
+  pref: ["都道府県名"],
+  city: ["市区町村名"],
+  name: ["事業所名", "介護サービス事業所名称", "事業所名称"],
+  service: ["サービスの種類", "実施サービス"],
+  address: ["住所"],
+  building: ["方書（ビル名等）", "方書"],
+  lat: ["緯度"],
+  lng: ["経度"],
+  tel: ["電話番号"],
+  fax: ["FAX番号"],
+  corp: ["法人の名称", "法人名"],
+  number: ["事業所番号"],
+  capacity: ["定員"],
+  url: ["URL", "ホームページ"]
+};
+
+function normalizeRows(rows, fallbackService) {
+  const header = rows[0];
+  const idx = {};
+  for (const [key, cands] of Object.entries(COLUMNS)) idx[key] = columnIndex(header, cands);
+  if (idx.name === -1 || idx.address === -1) {
+    throw new Error("必要な列（事業所名・住所）が見つかりません: " + header.join(","));
+  }
+  const get = (r, k) => (idx[k] === -1 ? "" : (r[idx[k]] || "").trim());
+  const out = [];
+  for (const r of rows.slice(1)) {
+    const name = get(r, "name");
+    if (!name) continue;
+    const code = get(r, "code").replace(/\D/g, "");
+    let pi = code.length >= 2 ? Number(code.slice(0, 2)) - 1 : -1;
+    if (!(pi >= 0 && pi < 47)) pi = PREFS.indexOf(get(r, "pref"));
+    if (pi === -1) {
+      const addr = get(r, "address");
+      pi = PREFS.findIndex((p) => addr.startsWith(p));
+    }
+    if (pi === -1) continue;
+    const cityCode = code.length >= 5 ? code.slice(0, 5) : "";
+    let city = get(r, "city");
+    if (!city) {
+      const m = get(r, "address").replace(PREFS[pi], "").match(/^(.+?[市区町村])/);
+      city = m ? m[1] : "（市区町村不明）";
+    }
+    const lat = Number(get(r, "lat"));
+    const lng = Number(get(r, "lng"));
+    let url = get(r, "url");
+    if (url && !/^https?:\/\//i.test(url)) url = /^www\./i.test(url) ? "https://" + url : "";
+    out.push({
+      pref: pi,
+      cityCode,
+      city,
+      name,
+      service: get(r, "service") || fallbackService || "",
+      address: [get(r, "address"), get(r, "building")].filter(Boolean).join(" "),
+      tel: get(r, "tel"),
+      fax: get(r, "fax"),
+      corp: get(r, "corp"),
+      number: get(r, "number"),
+      capacity: get(r, "capacity"),
+      url,
+      lat: Number.isFinite(lat) && lat > 20 && lat < 46 ? Math.round(lat * 1e5) / 1e5 : null,
+      lng: Number.isFinite(lng) && lng > 122 && lng < 154 ? Math.round(lng * 1e5) / 1e5 : null
+    });
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------- 取得
+
+async function fetchWithRetry(url, tries = 4) {
+  for (let i = 0; ; i++) {
+    try {
+      const res = await fetch(url, { headers: { "User-Agent": "kaigo-navi-builder" } });
+      if (!res.ok) throw new Error(`HTTP ${res.status} ${url}`);
+      return Buffer.from(await res.arrayBuffer());
+    } catch (err) {
+      if (i >= tries - 1) throw err;
+      await new Promise((r) => setTimeout(r, 2000 * 2 ** i));
+    }
+  }
+}
+
+async function loadSources() {
+  if (CSV_DIR) {
+    const files = fs.readdirSync(CSV_DIR).filter((f) => /\.csv$/i.test(f)).sort();
+    return files.map((f) => ({ label: f, buf: fs.readFileSync(path.join(CSV_DIR, f)) }));
+  }
+  console.log("オープンデータのページを取得:", OPEN_DATA_PAGE);
+  const html = decode(await fetchWithRetry(OPEN_DATA_PAGE));
+  const links = [...new Set([...html.matchAll(/href="([^"]+\.csv)"/gi)].map((m) => new URL(m[1], OPEN_DATA_PAGE).href))];
+  if (!links.length) throw new Error("CSVへのリンクが見つかりませんでした。ページ構成が変わった可能性があります。");
+  console.log(`CSV ${links.length} 件を取得します`);
+  const sources = [];
+  for (const url of links) {
+    sources.push({ label: url, buf: await fetchWithRetry(url) });
+    process.stdout.write(".");
+  }
+  process.stdout.write("\n");
+  return sources;
+}
+
+// ---------------------------------------------------------------- HTML
+
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const telHref = (t) => "tel:" + t.replace(/[^0-9+]/g, "");
+
+function page({ title, description, canonical, depth, body, jsonLd }) {
+  const up = "../".repeat(depth);
+  return `<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(description)}">
+<link rel="canonical" href="${esc(canonical)}">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(description)}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="${esc(canonical)}">
+<link rel="stylesheet" href="${up}assets/style.css">
+${jsonLd ? `<script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, "\\u003c")}</script>` : ""}
+</head>
+<body>
+<header id="site-header"></header>
+<main class="wrap">
+${body}
+</main>
+<footer id="site-footer"></footer>
+<script src="${up}assets/main.js"></script>
+</body>
+</html>
+`;
+}
+
+function officeCard(o) {
+  const rows = [];
+  rows.push(`<dt>住所</dt><dd>${esc(o.address)}</dd>`);
+  if (o.tel) rows.push(`<dt>電話</dt><dd>${esc(o.tel)}</dd>`);
+  if (o.fax) rows.push(`<dt>FAX</dt><dd>${esc(o.fax)}</dd>`);
+  if (o.corp) rows.push(`<dt>法人</dt><dd>${esc(o.corp)}</dd>`);
+  if (o.capacity) rows.push(`<dt>定員</dt><dd>${esc(o.capacity)}</dd>`);
+  if (o.number) rows.push(`<dt>事業所番号</dt><dd>${esc(o.number)}</dd>`);
+  const buttons = [];
+  if (o.tel) buttons.push(`<a class="btn tel" href="${esc(telHref(o.tel))}">📞 電話する</a>`);
+  const q = o.lat && o.lng ? `${o.lat},${o.lng}` : o.address;
+  buttons.push(`<a class="btn secondary" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&amp;query=${encodeURIComponent(q)}">地図</a>`);
+  if (o.url) buttons.push(`<a class="btn secondary" target="_blank" rel="noopener nofollow" href="${esc(o.url)}">ホームページ</a>`);
+  return `<article class="card facility">
+<div>${o.services.map((s) => `<span class="type">${esc(s)}</span>`).join(" ")}</div>
+<h3>${esc(o.name)}</h3>
+<dl>${rows.join("")}</dl>
+<div class="btn-row">${buttons.join("")}</div>
+</article>`;
+}
+
+// 同じ事業所番号・同じ所在地のサービスを1件にまとめる
+function groupOffices(records) {
+  const map = new Map();
+  for (const r of records) {
+    const key = (r.number || r.name) + "|" + r.address;
+    let o = map.get(key);
+    if (!o) {
+      o = { ...r, services: [], cats: new Set() };
+      map.set(key, o);
+    }
+    if (r.service && !o.services.includes(r.service)) o.services.push(r.service);
+    o.cats.add(categoryOf(r.service));
+    if (!o.tel && r.tel) o.tel = r.tel;
+    if (!o.url && r.url) o.url = r.url;
+  }
+  return [...map.values()];
+}
+
+// ---------------------------------------------------------------- ビルド
+
+function copyStatic() {
+  fs.rmSync(DIST, { recursive: true, force: true });
+  fs.mkdirSync(DIST, { recursive: true });
+  const skip = new Set(["dist", "scripts", "node_modules", ".git", ".github", "README.md", "package.json", "package-lock.json", ".gitignore"]);
+  for (const entry of fs.readdirSync(ROOT)) {
+    if (skip.has(entry) || entry.startsWith(".")) continue;
+    fs.cpSync(path.join(ROOT, entry), path.join(DIST, entry), { recursive: true });
+  }
+}
+
+function write(rel, content) {
+  const file = path.join(DIST, rel);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, content);
+}
+
+async function main() {
+  copyStatic();
+
+  const sources = await loadSources();
+  let records = [];
+  for (const { label, buf } of sources) {
+    const rows = parseCsv(decode(buf));
+    if (rows.length < 2) continue;
+    try {
+      const rs = normalizeRows(rows, "");
+      records = records.concat(rs);
+      console.log(`  ${path.basename(label)}: ${rs.length} 件`);
+    } catch (err) {
+      console.warn(`  ${path.basename(label)}: スキップ（${err.message.slice(0, 120)}）`);
+    }
+  }
+  if (!records.length) throw new Error("事業所データが1件も取り込めませんでした。");
+
+  // 重複行（同じ事業所番号・サービス）を除く
+  const seen = new Set();
+  records = records.filter((r) => {
+    const k = r.number + "|" + r.service + "|" + r.name + "|" + r.address;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+
+  const builtAt = new Date().toISOString().slice(0, 10);
+  const urls = [];
+  const areas = [];
+  const categoryLabels = CATEGORIES.map(([id, label]) => ({ id, label }));
+
+  for (let pi = 0; pi < 47; pi++) {
+    const pc = prefCode(pi);
+    const prefRecords = records.filter((r) => r.pref === pi);
+    const offices = groupOffices(prefRecords);
+
+    // 市区町村ごと
+    const cityMap = new Map();
+    for (const o of offices) {
+      const key = o.cityCode || o.city;
+      if (!cityMap.has(key)) cityMap.set(key, { code: o.cityCode, name: o.city, offices: [] });
+      cityMap.get(key).offices.push(o);
+    }
+    const cities = [...cityMap.values()].sort((a, b) => (a.code || "99999").localeCompare(b.code || "99999") || a.name.localeCompare(b.name, "ja"));
+    cities.forEach((c, i) => { c.slug = c.code || `${pc}x${String(i).padStart(3, "0")}`; });
+
+    // 検索ページ用JSON（列を配列で持ってサイズを抑える）
+    const services = [];
+    const serviceIndex = (s) => {
+      let i = services.indexOf(s);
+      if (i === -1) { i = services.length; services.push(s); }
+      return i;
+    };
+    const cityIndex = new Map(cities.map((c, i) => [c, i]));
+    const rows = [];
+    for (const c of cities) {
+      for (const o of c.offices) {
+        rows.push([
+          o.name, cityIndex.get(c), o.address, o.tel, o.fax, o.corp, o.number, o.capacity, o.url,
+          o.lat, o.lng, o.services.map(serviceIndex), [...o.cats]
+        ]);
+      }
+    }
+    write(`data/pref/${pc}.json`, JSON.stringify({
+      pref: PREFS[pi],
+      builtAt,
+      fields: ["name", "city", "address", "tel", "fax", "corp", "number", "capacity", "url", "lat", "lng", "services", "cats"],
+      cities: cities.map((c) => ({ code: c.code, name: c.name, slug: c.slug })),
+      services,
+      rows
+    }));
+
+    areas.push({ code: pc, name: PREFS[pi], count: offices.length, cities: cities.map((c) => ({ slug: c.slug, name: c.name, count: c.offices.length })) });
+
+    // 市区町村ページ
+    for (const c of cities) {
+      const byCat = CATEGORIES.map(() => []);
+      for (const o of c.offices) {
+        const main = Math.min(...o.cats);
+        byCat[main].push(o);
+      }
+      const sections = byCat.map((list, ci) => list.length ? `
+<h2 id="${CATEGORIES[ci][0]}">${esc(CATEGORIES[ci][1])}（${list.length}件）</h2>
+<div class="grid">${list.sort((a, b) => a.name.localeCompare(b.name, "ja")).map(officeCard).join("\n")}</div>` : "").join("");
+      const toc = byCat.map((list, ci) => list.length ? `<a href="#${CATEGORIES[ci][0]}">${esc(CATEGORIES[ci][1])}（${list.length}）</a>` : "").join("");
+      const rel = `area/${pc}/${c.slug}.html`;
+      const canonical = `${SITE_URL}/${rel}`;
+      write(rel, page({
+        title: `${PREFS[pi]}${c.name}の介護事業所一覧（${c.offices.length}件）｜かいごナビ`,
+        description: `${PREFS[pi]}${c.name}の介護サービス事業所・施設${c.offices.length}件の住所・電話番号。ケアマネ事業所、訪問介護、訪問看護、デイサービス、特養、グループホームなど。`,
+        canonical,
+        depth: 2,
+        jsonLd: {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "かいごナビ", item: `${SITE_URL}/` },
+            { "@type": "ListItem", position: 2, name: PREFS[pi], item: `${SITE_URL}/area/${pc}/` },
+            { "@type": "ListItem", position: 3, name: c.name, item: canonical }
+          ]
+        },
+        body: `<p class="small muted"><a href="../../index.html">トップ</a> › <a href="index.html">${esc(PREFS[pi])}</a> › ${esc(c.name)}</p>
+<h1>${esc(PREFS[pi])}${esc(c.name)}の介護事業所</h1>
+<p class="lead">${c.offices.length}件の事業所・施設を掲載しています。電話番号をタップするとそのまま電話できます。</p>
+<div class="tip">はじめて介護サービスを使う方は、まず${esc(c.name)}の<strong>地域包括支援センター</strong>か介護保険の窓口に相談しましょう（<a href="../../shisetsu.html">相談窓口の探し方</a>）。要介護の認定を受けた方は、下の「ケアプラン作成（居宅介護支援）」の事業所でケアマネジャーを探せます。</div>
+<nav class="toc" aria-label="サービスの種類">${toc}</nav>
+<p><a class="btn secondary" href="../../search.html?pref=${pc}&amp;city=${encodeURIComponent(c.slug)}">名前やサービスで絞り込む</a></p>
+${sections}
+<p class="note">出典：厚生労働省「介護サービス情報公表システム」オープンデータ（${builtAt} 取得・加工）。内容は公表時点のもので、休止・廃止・移転などで変わっている場合があります。利用前に事業所へ直接ご確認いただくか、<a href="https://www.kaigokensaku.mhlw.go.jp/" target="_blank" rel="noopener">介護サービス情報公表システム</a>で最新情報をご確認ください。</p>`
+      }));
+      urls.push(canonical);
+    }
+
+    // 都道府県ページ
+    const rel = `area/${pc}/index.html`;
+    const canonical = `${SITE_URL}/area/${pc}/`;
+    write(rel, page({
+      title: `${PREFS[pi]}の介護事業所一覧（市区町村別）｜かいごナビ`,
+      description: `${PREFS[pi]}の介護サービス事業所・施設${offices.length}件を市区町村別に掲載。住所・電話番号を確認できます。`,
+      canonical,
+      depth: 2,
+      body: `<p class="small muted"><a href="../../index.html">トップ</a> › ${esc(PREFS[pi])}</p>
+<h1>${esc(PREFS[pi])}の介護事業所</h1>
+<p class="lead">市区町村を選んでください（全${offices.length}件）。</p>
+<div class="chips">${cities.map((c) => `<a class="chip" href="${esc(c.slug)}.html">${esc(c.name)}（${c.offices.length}）</a>`).join("")}</div>
+<p><a class="btn secondary" href="../../search.html?pref=${pc}">${esc(PREFS[pi])}の事業所を名前で検索</a></p>`
+    }));
+    urls.push(canonical);
+  }
+
+  // 全国の都道府県一覧
+  write("area/index.html", page({
+    title: "全国の介護事業所一覧（都道府県別）｜かいごナビ",
+    description: "全国の介護サービス事業所・施設を都道府県・市区町村別に掲載。",
+    canonical: `${SITE_URL}/area/`,
+    depth: 1,
+    body: `<h1>全国の介護事業所（都道府県別）</h1>
+<div class="chips">${areas.map((a) => `<a class="chip" href="${a.code}/">${esc(a.name)}（${a.count}）</a>`).join("")}</div>`
+  }));
+  urls.push(`${SITE_URL}/area/`);
+
+  write("data/areas.json", JSON.stringify({ builtAt, categories: categoryLabels, prefs: areas.map((a) => ({ code: a.code, name: a.name, count: a.count })) }));
+
+  // sitemap / robots
+  for (const p of ["", "index.html", "search.html", "seido.html", "shisetsu-shurui.html", "shisetsu.html", "jigyo.html", "faq.html"]) {
+    if (p !== "index.html") urls.unshift(`${SITE_URL}/${p}`);
+  }
+  const chunks = [];
+  for (let i = 0; i < urls.length; i += 45000) chunks.push(urls.slice(i, i + 45000));
+  chunks.forEach((list, i) => {
+    write(`sitemap-${i + 1}.xml`, `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${list.map((u) => `<url><loc>${esc(u)}</loc><lastmod>${builtAt}</lastmod></url>`).join("\n")}\n</urlset>\n`);
+  });
+  write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${chunks.map((_, i) => `<sitemap><loc>${SITE_URL}/sitemap-${i + 1}.xml</loc><lastmod>${builtAt}</lastmod></sitemap>`).join("\n")}\n</sitemapindex>\n`);
+  write("robots.txt", `User-agent: *\nAllow: /\nSitemap: ${SITE_URL}/sitemap.xml\n`);
+  write(".nojekyll", "");
+
+  const total = areas.reduce((n, a) => n + a.count, 0);
+  console.log(`完了: 事業所 ${total} 件 / ページ ${urls.length} 件 → ${path.relative(ROOT, DIST)}/`);
+}
+
+main().catch((err) => {
+  console.error("ビルド失敗:", err.message);
+  process.exit(1);
+});

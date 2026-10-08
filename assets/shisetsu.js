@@ -31,7 +31,7 @@
   }
 
   function card(f) {
-    var telHref = f.tel ? "tel:" + f.tel.replace(/[^0-9#+]/g, "") : "";
+    var telHref = f.tel ? "tel:" + f.tel.replace(/[^0-9#+]/g, "").replace("#", "%23") : "";
     var rows = "";
     if (f.area) rows += "<dt>地区</dt><dd>" + esc(f.area) + "</dd>";
     if (f.address) rows += "<dt>住所</dt><dd>" + esc(f.address) + "</dd>";

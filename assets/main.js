@@ -1,19 +1,26 @@
 // 全ページ共通：ヘッダー・フッターの差し込み、メニュー開閉、文字サイズ切替
 (function () {
+  // サイトのルート（このスクリプトの場所から逆算。サブフォルダのページでもリンクが正しくなる）
+  var script = document.currentScript;
+  var base = script ? script.src.replace(/assets\/main\.js(\?.*)?$/, "") : "";
+  window.SITE_BASE = base;
+
   var pages = [
     ["index.html", "トップ"],
+    ["search.html", "全国の事業所検索"],
     ["seido.html", "介護保険のしくみ"],
     ["shisetsu-shurui.html", "施設・サービスの種類"],
-    ["shisetsu.html", "相談先・施設一覧"],
+    ["shisetsu.html", "相談窓口"],
     ["jigyo.html", "事業者向け 指定要件"],
-    ["faq.html", "よくある質問"],
-    ["ai.html", "AIに質問"]
+    ["faq.html", "よくある質問"]
   ];
-  var current = location.pathname.split("/").pop() || "index.html";
+  var here = location.href.split(/[?#]/)[0];
+  if (/\/$/.test(here)) here += "index.html";
 
   var nav = pages.map(function (p) {
-    var cur = p[0] === current ? ' aria-current="page"' : "";
-    return '<a href="' + p[0] + '"' + cur + ">" + p[1] + "</a>";
+    var href = base + p[0];
+    var cur = href === here ? ' aria-current="page"' : "";
+    return '<a href="' + href + '"' + cur + ">" + p[1] + "</a>";
   }).join("");
 
   var header = document.getElementById("site-header");
@@ -21,14 +28,14 @@
     header.className = "site-header";
     header.innerHTML =
       '<div class="wrap">' +
-      '<a class="logo" href="index.html"><span class="logo-mark" aria-hidden="true">介</span>かいごナビ</a>' +
+      '<a class="logo" href="' + base + 'index.html"><span class="logo-mark" aria-hidden="true">介</span>かいごナビ</a>' +
       '<button class="font-btn" id="font-btn" type="button" aria-pressed="false">文字 大</button>' +
       '<button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">メニュー</button>' +
       '<nav class="site-nav" id="site-nav" aria-label="メインメニュー">' + nav + "</nav>" +
       "</div>";
     header.insertAdjacentHTML("afterend",
       '<div class="urgent"><div class="wrap">' +
-      '<strong>命に関わる緊急時は 119</strong>。迷ったら、まずはお住まいの <a href="shisetsu.html?type=houkatsu">地域包括支援センター</a> か市区町村の介護保険窓口へ。' +
+      '<strong>命に関わる緊急時は 119</strong>。迷ったら、まずはお住まいの地域包括支援センターか市区町村の介護保険窓口へ（<a href="' + base + 'shisetsu.html">相談窓口の探し方</a>）。' +
       "</div></div>");
 
     var toggle = document.getElementById("nav-toggle");
@@ -63,7 +70,7 @@
       "制度・料金・人員基準は改定や自治体によって変わります。最終的な判断は、市区町村の介護保険窓口、地域包括支援センター、" +
       '<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/kaigo_koureisha/index.html" target="_blank" rel="noopener">厚生労働省</a>、' +
       "指定権者（都道府県・市区町村）の最新情報でご確認ください。</p>" +
-      '<p>施設を探す：<a href="https://www.kaigokensaku.mhlw.go.jp/" target="_blank" rel="noopener">介護サービス情報公表システム（厚生労働省）</a></p>' +
+      '<p>事業所データの出典：厚生労働省「<a href="https://www.mhlw.go.jp/stf/kaigo-kouhyou_opendata.html" target="_blank" rel="noopener">介護サービス情報公表システム オープンデータ</a>」（当サイトで加工して掲載）</p>' +
       "<p>© かいごナビ</p>" +
       "</div>";
   }

@@ -12,7 +12,7 @@
 
 <main class="wrap">
   <h1>よくある質問（Q&amp;A）</h1>
-  <p class="lead">知りたいことをキーワードで探せます。見つからないときは <a href="ai.html">AIに質問</a> してみてください。</p>
+  <p class="lead">知りたいことをキーワードで探せます。見つからないときは、お住まいの<a href="shisetsu.html">地域包括支援センター</a>に相談してみてください。</p>
 
   <div class="search-bar" role="search">
     <input type="search" id="faq-q" placeholder="例：費用、特養、退院、ケアマネ" aria-label="質問を検索" autocomplete="off">
@@ -61,7 +61,7 @@
       return '<details class="faq"' + (words.length ? " open" : "") + "><summary>" + esc(f.q) +
         '<span class="faq-cat">' + esc(f.cat) + "</span></summary>" +
         '<div class="answer">' + esc(f.a) + "</div></details>";
-    }).join("") || '<p class="muted">該当する質問が見つかりませんでした。<a href="ai.html">AIに質問</a>してみてください。</p>';
+    }).join("") || '<p class="muted">該当する質問が見つかりませんでした。<a href="shisetsu.html">相談窓口</a>に問い合わせてみてください。</p>';
     count.textContent = hits.length + "件";
   }
 

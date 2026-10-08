@@ -326,6 +326,7 @@ input:focus, select:focus, textarea:focus, .btn:focus-visible, a:focus-visible {
   font-size: .88rem;
   cursor: pointer;
 }
+a.chip { text-decoration: none; display: inline-block; }
 .chip[aria-pressed="true"] { background: var(--primary); color: var(--primary-ink); border-color: var(--primary); }
 
 .facility { display: flex; flex-direction: column; gap: 6px; }
@@ -380,3 +381,6 @@ input:focus, select:focus, textarea:focus, .btn:focus-visible, a:focus-visible {
   .site-header, .urgent, .site-footer, .nav-toggle, .chat-form { display: none !important; }
   body { background: #fff; color: #000; }
 }
+
+[hidden] { display: none !important; }
+.search-bar select { flex: 1 1 160px; }

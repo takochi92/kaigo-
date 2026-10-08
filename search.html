@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全国の介護事業所検索｜かいごナビ</title>
+<meta name="description" content="全国の介護サービス事業所・施設を、都道府県・市区町村・サービスの種類・名前で検索。住所・電話番号を確認し、そのまま電話できます。">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header id="site-header"></header>
+
+<main class="wrap">
+  <h1>全国の介護事業所検索</h1>
+  <p class="lead">厚生労働省が公開している全国の介護サービス事業所データから探せます。電話番号をタップするとそのまま電話できます。</p>
+
+  <form class="card" id="search-form" role="search" onsubmit="return false">
+    <div class="search-bar" style="margin:0 0 10px">
+      <select id="pref" aria-label="都道府県"><option value="">都道府県を選ぶ</option></select>
+      <select id="city" aria-label="市区町村" disabled><option value="">市区町村（すべて）</option></select>
+    </div>
+    <div class="search-bar" style="margin:0 0 10px">
+      <input type="search" id="q" placeholder="事業所名・法人名・住所（例：ケアプラン、中央町）" aria-label="キーワード" autocomplete="off">
+      <button class="btn secondary" type="button" id="near">📍 近い順</button>
+    </div>
+    <div class="chips" id="cats" aria-label="サービスの種類" style="margin:0"></div>
+  </form>
+
+  <p class="muted small" id="status" aria-live="polite">都道府県を選んでください。</p>
+  <div class="grid" id="results"></div>
+  <p style="text-align:center;margin-top:16px"><button class="btn secondary" id="more" type="button" hidden>もっと見る</button></p>
+
+  <p class="note" id="source-note">出典：厚生労働省「介護サービス情報公表システム」オープンデータ（当サイトで加工）。内容は公表時点のもので、休止・移転などで変わっている場合があります。利用前に事業所へ直接ご確認いただくか、<a href="https://www.kaigokensaku.mhlw.go.jp/" target="_blank" rel="noopener">介護サービス情報公表システム</a>で最新情報をご確認ください。</p>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="assets/main.js"></script>
+<script src="assets/search.js"></script>
+</body>
+</html>

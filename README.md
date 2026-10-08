@@ -6,47 +6,41 @@
 
 | ファイル | 内容 |
 |---|---|
-| `index.html` | トップ：利用開始までの流れ、困りごと別の連絡先 |
-| `seido.html` | 介護保険のしくみ：対象者、申請〜利用の流れ、要介護度、支給限度額、自己負担、軽減制度 |
-| `shisetsu-shurui.html` | 施設・サービスの種類：特養・老健・介護医療院・グループホーム・サ高住・有料老人ホーム・在宅サービス |
-| `shisetsu.html` | 相談先・施設一覧：種類で絞り込み、キーワード検索、タップで電話、地図リンク |
-| `jigyo.html` | 事業者向け：指定要件（法人格・人員・設備・運営）、サービス別基準、開業の流れ、チェックリスト |
-| `faq.html` | よくある質問（検索・カテゴリ絞り込み） |
-| `ai.html` | AIに質問（Claude API。未接続時はFAQから回答） |
+| `index.html` | トップ：利用開始までの流れ、都道府県別の入り口、困りごと別の連絡先 |
+| `search.html` | 全国の介護事業所検索（都道府県・市区町村・サービス種類・キーワード・現在地から近い順） |
+| `area/〇〇/〇〇〇〇〇.html` | 市区町村ごとの事業所一覧ページ（ビルド時に自動生成。Google検索向け） |
+| `seido.html` | 介護保険のしくみ |
+| `shisetsu-shurui.html` | 施設・サービスの種類 |
+| `shisetsu.html` | 相談窓口：地域包括支援センターの探し方、全国の電話相談 |
+| `jigyo.html` | 事業者向け：指定要件・開業の流れ・チェックリスト |
+| `faq.html` | よくある質問 |
 
-ビルド不要の静的HTML/CSS/JSです。`index.html` をブラウザで開くだけでも見られます。
+## 事業所データ（国のオープンデータ）
 
-## 施設・連絡先の登録
+`scripts/build.mjs` が、厚生労働省「[介護サービス情報公表システム オープンデータ](https://www.mhlw.go.jp/stf/kaigo-kouhyou_opendata.html)」のCSV（全国の介護サービス事業所。訪問看護ステーションを含む）を取得し、
 
-`data/facilities.js` を編集します。いま入っている「〇〇市」のデータは **表示確認用の架空データ（`sample: true`）** です。地域の実データに差し替えて、サンプル行は削除してください。実データの確認には [介護サービス情報公表システム](https://www.kaigokensaku.mhlw.go.jp/) や市区町村のホームページが使えます。
+- `dist/data/pref/〇〇.json`（検索ページ用）
+- `dist/area/〇〇/…html`（市区町村別ページ）
+- `dist/sitemap.xml`・`robots.txt`
 
-```js
-{
-  type: "houkatsu",            // 種類（ファイル先頭の一覧を参照）
-  name: "△△市 中央地域包括支援センター",
-  area: "△△市 中央地区",
-  address: "△△県△△市…",
-  tel: "0xx-xxx-xxxx",
-  hours: "平日 8:30〜17:15",
-  url: "https://…",
-  note: "担当地区など"
-}
+を生成します。国のデータは年2回（6月末・12月末時点）更新されるため、GitHub Actions で毎月自動的に再取得・再公開します。出典表記はフッター・各ページに入っています。
+
+```bash
+npm run build                                   # 厚労省から取得してビルド
+node scripts/build.mjs --csv-dir ./csv          # 手元に保存したCSVからビルド
+npm run serve                                   # http://localhost:8000 で確認
 ```
 
-FAQは `data/faq.js` で追加・編集できます（`keywords` はAI未接続時の検索に使われます）。
+`data/facilities.js` には、オープンデータに含まれない全国の電話相談窓口を手作業で登録しています。
 
-## AI質問機能の有効化
+## 公開（GitHub Pages）
 
-`api/chat.js` はサーバー側で Claude API を呼ぶサーバーレス関数です（Vercel 想定）。APIキーをブラウザに出さないため、必ずサーバー側で動かします。
+1. GitHub のリポジトリ → Settings → Pages → Source を「GitHub Actions」にする
+2. Actions タブで「Build and deploy」を実行（push でも自動実行）
+3. `https://takochi92.github.io/kaigo-/` で公開されます
 
-1. Vercel にこのリポジトリをインポート
-2. 環境変数 `ANTHROPIC_API_KEY` を設定
-3. デプロイ
-
-GitHub Pages など静的ホスティングだけで公開した場合は、AI質問ページが自動で「よくある質問から回答するモード」になります。
-
-ローカルで試す場合：`npm install` のあと `ANTHROPIC_API_KEY=... npx vercel dev`
+Google検索に出すには、[Google Search Console](https://search.google.com/search-console) にサイトを登録し、`sitemap.xml` を送信してください。独自ドメインを使う場合は Pages の Custom domain を設定します（sitemap のURLは自動で切り替わります）。
 
 ## 注意
 
-掲載内容は主に2024年度介護報酬改定時点の一般的な情報です。制度・金額・基準は改定や自治体によって変わるため、公開前と定期的に、厚生労働省・指定権者・市区町村の最新情報で確認してください。
+制度の解説は主に2024年度介護報酬改定時点の一般的な情報です。制度・金額・基準は改定や自治体によって変わるため、定期的に厚生労働省・指定権者・市区町村の最新情報で確認してください。

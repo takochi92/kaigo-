@@ -2,12 +2,11 @@
   "name": "kaigo-navi",
   "version": "1.0.0",
   "private": true,
-  "description": "介護の制度・相談先・施設情報をまとめたサイト（AI質問機能つき）",
+  "description": "介護の制度・相談窓口・全国の介護事業所検索サイト",
   "type": "module",
+  "engines": { "node": ">=20" },
   "scripts": {
-    "dev": "vercel dev"
-  },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.132.0"
+    "build": "node scripts/build.mjs",
+    "serve": "python3 -m http.server 8000 -d dist"
   }
 }
