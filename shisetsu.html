@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>相談先・施設一覧｜かいごナビ</title>
+<meta name="description" content="地域包括支援センター、居宅介護支援事業所、特養、グループホーム、サ高住などの住所・電話番号一覧。タップで電話、地図表示ができます。">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header id="site-header"></header>
+
+<main class="wrap">
+  <h1>相談先・施設一覧</h1>
+  <p class="lead">電話番号をタップするとそのまま電話できます。住所の「地図」から場所を確認できます。</p>
+
+  <div class="note" id="sample-note">
+    <strong>※「サンプル」と表示されている施設は、表示確認用の架空データです。</strong>
+    実際の施設を探すときは、<a href="https://www.kaigokensaku.mhlw.go.jp/" target="_blank" rel="noopener">介護サービス情報公表システム（厚生労働省）</a>や、市区町村のホームページをご利用ください。
+  </div>
+
+  <div class="search-bar" role="search">
+    <label class="muted small" for="q" style="width:100%">キーワード（施設名・地区・住所）</label>
+    <input type="search" id="q" placeholder="例：中央、北町、グループホーム" autocomplete="off">
+  </div>
+  <div class="chips" id="chips" aria-label="種類で絞り込み"></div>
+  <p class="muted small" id="count" aria-live="polite"></p>
+
+  <div class="grid" id="list"></div>
+
+  <h2>電話する前に準備しておくとスムーズなこと</h2>
+  <div class="card">
+    <ul class="small" style="margin:0">
+      <li>本人の氏名・年齢・住所（どの地区か）</li>
+      <li>介護保険被保険者証の有無、要介護度（認定を受けている場合）</li>
+      <li>今困っていること（例：「退院後の生活が不安」「物忘れが増えた」「転んでから歩けない」）</li>
+      <li>かかりつけの病院・主治医、持病、飲んでいる薬</li>
+      <li>家族の状況（同居・別居、日中に介護できる人がいるか）</li>
+      <li>担当ケアマネジャーがいる場合は、その事業所名と名前</li>
+    </ul>
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn secondary" type="button" onclick="window.print()">このページを印刷する</button>
+    </div>
+  </div>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="assets/main.js"></script>
+<script src="data/facilities.js"></script>
+<script src="assets/shisetsu.js"></script>
+</body>
+</html>

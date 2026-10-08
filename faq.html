@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>よくある質問｜かいごナビ</title>
+<meta name="description" content="介護の始め方、要介護認定、費用、施設入所、在宅介護、認知症、仕事との両立、事業者向けのよくある質問。">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header id="site-header"></header>
+
+<main class="wrap">
+  <h1>よくある質問（Q&amp;A）</h1>
+  <p class="lead">知りたいことをキーワードで探せます。見つからないときは <a href="ai.html">AIに質問</a> してみてください。</p>
+
+  <div class="search-bar" role="search">
+    <input type="search" id="faq-q" placeholder="例：費用、特養、退院、ケアマネ" aria-label="質問を検索" autocomplete="off">
+  </div>
+  <div class="chips" id="faq-cats" aria-label="カテゴリで絞り込み"></div>
+  <p class="muted small" id="faq-count" aria-live="polite"></p>
+  <div id="faq-list"></div>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="assets/main.js"></script>
+<script src="data/faq.js"></script>
+<script>
+(function () {
+  var faq = window.FAQ || [];
+  var list = document.getElementById("faq-list");
+  var input = document.getElementById("faq-q");
+  var catsBox = document.getElementById("faq-cats");
+  var count = document.getElementById("faq-count");
+  var active = "";
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  var cats = [];
+  faq.forEach(function (f) { if (cats.indexOf(f.cat) === -1) cats.push(f.cat); });
+
+  function renderCats() {
+    catsBox.innerHTML = ['<button class="chip" type="button" data-cat="" aria-pressed="' + (active === "") + '">すべて</button>']
+      .concat(cats.map(function (c) {
+        return '<button class="chip" type="button" data-cat="' + esc(c) + '" aria-pressed="' + (active === c) + '">' + esc(c) + "</button>";
+      })).join("");
+  }
+
+  function render() {
+    var words = input.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    var hits = faq.filter(function (f) {
+      if (active && f.cat !== active) return false;
+      var hay = (f.q + " " + f.a + " " + (f.keywords || []).join(" ")).toLowerCase();
+      return words.every(function (w) { return hay.indexOf(w) !== -1; });
+    });
+    list.innerHTML = hits.map(function (f) {
+      return '<details class="faq"' + (words.length ? " open" : "") + "><summary>" + esc(f.q) +
+        '<span class="faq-cat">' + esc(f.cat) + "</span></summary>" +
+        '<div class="answer">' + esc(f.a) + "</div></details>";
+    }).join("") || '<p class="muted">該当する質問が見つかりませんでした。<a href="ai.html">AIに質問</a>してみてください。</p>';
+    count.textContent = hits.length + "件";
+  }
+
+  catsBox.addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-cat]");
+    if (!b) return;
+    active = b.getAttribute("data-cat");
+    renderCats();
+    render();
+  });
+  input.addEventListener("input", render);
+  renderCats();
+  render();
+})();
+</script>
+</body>
+</html>
