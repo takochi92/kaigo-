@@ -9,6 +9,7 @@
     ["index.html", "トップ"],
     ["search.html", "事業所・病院検索"],
     ["manga.html", "まんがでわかる"],
+    ["yomimono/index.html", "読みもの"],
     ["seido.html", "介護保険のしくみ"],
     ["shisetsu-shurui.html", "施設・サービスの種類"],
     ["shisetsu.html", "相談窓口"],

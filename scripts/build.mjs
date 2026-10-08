@@ -23,6 +23,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = path.join(ROOT, "dist");
 const OPEN_DATA_PAGE = "https://www.mhlw.go.jp/stf/kaigo-kouhyou_opendata.html";
 const MED_DATA_PAGE = "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iryou/newpage_43373.html";
+const SITE_CONFIG = JSON.parse(fs.readFileSync(path.join(ROOT, "site.config.json"), "utf8"));
 const SITE_URL = (process.env.SITE_URL || "https://takochi92.github.io/kaigo-").replace(/\/$/, "");
 
 const args = process.argv.slice(2);
@@ -464,7 +465,7 @@ function groupOffices(records) {
 function copyStatic() {
   fs.rmSync(DIST, { recursive: true, force: true });
   fs.mkdirSync(DIST, { recursive: true });
-  const skip = new Set(["dist", "scripts", "node_modules", ".git", ".github", "README.md", "package.json", "package-lock.json", ".gitignore"]);
+  const skip = new Set(["site.config.json", "dist", "scripts", "node_modules", ".git", ".github", "README.md", "package.json", "package-lock.json", ".gitignore"]);
   for (const entry of fs.readdirSync(ROOT)) {
     if (skip.has(entry) || entry.startsWith(".")) continue;
     fs.cpSync(path.join(ROOT, entry), path.join(DIST, entry), { recursive: true });
@@ -484,7 +485,11 @@ function addShareTags() {
     e.isDirectory() ? walk(path.join(dir, e.name)) : e.name.endsWith(".html") ? [path.join(dir, e.name)] : []);
   for (const file of walk(DIST)) {
     let html = fs.readFileSync(file, "utf8");
-    if (html.includes('property="og:image"')) continue;
+    const ga = /^G-[A-Z0-9]+$/.test(SITE_CONFIG.gaId || "") && !html.includes("googletagmanager.com/gtag")
+      ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${SITE_CONFIG.gaId}"></script>\n<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","${SITE_CONFIG.gaId}");</script>`
+      : "";
+    if (ga) html = html.replace("</head>", ga + "\n</head>");
+    if (html.includes('property="og:image"')) { fs.writeFileSync(file, html); continue; }
     const rel = path.relative(DIST, file).split(path.sep).join("/");
     const url = `${SITE_URL}/${rel.replace(/(^|\/)index\.html$/, "$1")}`;
     const title = (html.match(/<title>([^<]*)<\/title>/) || [])[1] || "かいごナビ";
@@ -664,6 +669,9 @@ ${sections}
   write("data/areas.json", JSON.stringify({ builtAt, medAsOf: MED_AS_OF, categories: categoryLabels, prefs: areas.map((a) => ({ code: a.code, name: a.name, count: a.count })) }));
 
   // sitemap / robots
+  // 読みもの（yomimono/）のページもサイトマップに入れる
+  const yomi = fs.existsSync(path.join(ROOT, "yomimono")) ? fs.readdirSync(path.join(ROOT, "yomimono")).filter((f) => f.endsWith(".html")).sort().reverse() : [];
+  for (const f of yomi) urls.unshift(`${SITE_URL}/yomimono/${f === "index.html" ? "" : f}`);
   for (const p of ["", "index.html", "search.html", "manga.html", "seido.html", "shisetsu-shurui.html", "shisetsu.html", "jigyo.html", "faq.html", "about.html", "policy.html"]) {
     if (p !== "index.html") urls.unshift(`${SITE_URL}/${p}`);
   }
