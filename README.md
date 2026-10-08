@@ -7,7 +7,7 @@
 | ファイル | 内容 |
 |---|---|
 | `index.html` | トップ：利用開始までの流れ、都道府県別の入り口、困りごと別の連絡先 |
-| `search.html` | 全国の介護事業所検索（都道府県・市区町村・サービス種類・キーワード・現在地から近い順） |
+| `search.html` | 全国の介護事業所・病院検索（都道府県・市区町村・サービス種類・キーワード・現在地から近い順） |
 | `area/〇〇/〇〇〇〇〇.html` | 市区町村ごとの事業所一覧ページ（ビルド時に自動生成。Google検索向け） |
 | `seido.html` | 介護保険のしくみ |
 | `shisetsu-shurui.html` | 施設・サービスの種類 |
@@ -23,11 +23,13 @@
 - `dist/area/〇〇/…html`（市区町村別ページ）
 - `dist/sitemap.xml`・`robots.txt`
 
-を生成します。国のデータは年2回（6月末・12月末時点）更新されるため、GitHub Actions で毎月自動的に再取得・再公開します。出典表記はフッター・各ページに入っています。
+を生成します。病院・診療所・歯科診療所は、厚生労働省「[医療情報ネット オープンデータ](https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iryou/newpage_43373.html)」（ZIP）から取り込み、診療科も検索できます（助産所・薬局は対象外）。
+
+国のデータは年2回（6月末・12月末時点）更新されるため、GitHub Actions で毎月自動的に再取得・再公開します。出典表記はフッター・各ページに入っています。
 
 ```bash
 npm run build                                   # 厚労省から取得してビルド
-node scripts/build.mjs --csv-dir ./csv          # 手元に保存したCSVからビルド
+node scripts/build.mjs --csv-dir ./csv --med-dir ./med   # 手元に保存したCSV/ZIPからビルド
 npm run serve                                   # http://localhost:8000 で確認
 ```
 

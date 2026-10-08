@@ -40,7 +40,7 @@
     if (f.note) rows += "<dt>メモ</dt><dd>" + esc(f.note) + "</dd>";
 
     var buttons = "";
-    if (f.tel && !f.sample) buttons += '<a class="btn tel" href="' + esc(telHref) + '">📞 電話する</a>';
+    if (f.tel && !f.sample) buttons += '<a class="btn tel" href="' + esc(telHref) + '">電話する</a>';
     if (f.address && !f.sample) {
       buttons += '<a class="btn secondary" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=' +
         encodeURIComponent(f.address) + '">地図</a>';

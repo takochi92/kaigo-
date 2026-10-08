@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>かいごナビ｜介護の制度・相談先・施設情報</title>
-<meta name="description" content="介護が必要になったときに、何をすればいいか・どこに連絡すればいいかがわかる情報サイト。介護保険制度、施設の種類、全国の介護事業所検索、相談窓口、Q&A。">
+<title>かいごナビ｜介護の制度・相談窓口・介護事業所と病院の検索</title>
+<meta name="description" content="介護が必要になったときに、何をすればいいか・どこに連絡すればいいかがわかる情報サイト。介護保険制度、施設の種類、全国の介護事業所・病院・診療所の検索、相談窓口、Q&A。">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -12,15 +12,28 @@
 
 <main class="wrap">
   <section class="hero">
-    <h1>介護のこと、<br>まず何をすればいい？</h1>
-    <p class="lead">家族に介護が必要になったとき、制度・相談先・施設の情報をひとつにまとめました。連絡先はタップすればそのまま電話できます。</p>
-    <div class="btn-row">
-      <a class="btn" href="search.html">全国の介護事業所を探す</a>
-      <a class="btn secondary" href="shisetsu.html">相談窓口を探す</a>
-    </div>
+    <h1>介護のこと、まず何をすればいい？</h1>
+    <p>制度・相談窓口・全国の介護事業所と病院をひとつにまとめました。電話番号はタップでそのまま電話できます。</p>
   </section>
 
-  <h2>はじめての方へ：介護サービスを使うまでの流れ</h2>
+  <nav class="tiles" aria-label="大項目">
+    <a class="tile find" href="search.html"><strong>介護事業所を探す</strong><span>ケアマネ・訪問介護・デイ・特養など</span></a>
+    <a class="tile find" href="search.html?cat=byoin"><strong>病院・診療所を探す</strong><span>病院・クリニック・歯科</span></a>
+    <a class="tile find" href="shisetsu.html"><strong>相談窓口</strong><span>地域包括支援センター・電話相談</span></a>
+    <a class="tile" href="#flow"><strong>はじめての方へ</strong><span>サービスを使うまでの流れ</span></a>
+    <a class="tile" href="seido.html"><strong>介護保険のしくみ</strong><span>認定・費用・負担の軽減</span></a>
+    <a class="tile" href="shisetsu-shurui.html"><strong>施設・サービスの種類</strong><span>特養・グループホーム・サ高住</span></a>
+    <a class="tile" href="faq.html"><strong>よくある質問</strong><span>費用・入所・仕事との両立</span></a>
+    <a class="tile" href="jigyo.html"><strong>事業者向け</strong><span>指定要件・開業の流れ</span></a>
+  </nav>
+
+  <form class="quick" id="quick" onsubmit="return false">
+    <label for="quick-pref">地域から探す</label>
+    <select id="quick-pref"><option value="">都道府県を選ぶ</option></select>
+    <button class="btn" type="submit">一覧を見る</button>
+  </form>
+
+  <h2 id="flow">はじめての方へ：介護サービスを使うまでの流れ</h2>
   <ol class="steps">
     <li><strong>相談する</strong><br>お住まいの地域の<a href="shisetsu.html">地域包括支援センター</a>か、市区町村の介護保険担当窓口に相談します。相談は無料です。</li>
     <li><strong>要介護認定を申請する</strong><br>市区町村に申請します。本人・家族のほか、地域包括支援センターやケアマネジャーが代行することもできます。</li>
@@ -30,40 +43,6 @@
     <li><strong>サービスの利用開始</strong><br>事業所と契約し、デイサービス・ホームヘルプ・施設入所などを利用します。費用は原則1割（所得により2〜3割）です。</li>
   </ol>
   <p><a href="seido.html#flow">申請の流れをくわしく見る →</a></p>
-
-  <h2>知りたいことから探す</h2>
-  <div class="grid">
-    <a class="card" href="seido.html">
-      <span class="icon" aria-hidden="true">📘</span>
-      <h3>介護保険のしくみ</h3>
-      <p class="muted small">対象になる人、要介護度、自己負担、利用できる金額の上限など。</p>
-    </a>
-    <a class="card" href="shisetsu-shurui.html">
-      <span class="icon" aria-hidden="true">🏠</span>
-      <h3>施設・サービスの種類</h3>
-      <p class="muted small">特養・老健・グループホーム・サ高住・有料老人ホームなどの違いと入居条件。</p>
-    </a>
-    <a class="card" href="shisetsu.html">
-      <span class="icon" aria-hidden="true">📞</span>
-      <h3>相談窓口</h3>
-      <p class="muted small">地域包括支援センターの探し方、全国の電話相談窓口。</p>
-    </a>
-    <a class="card" href="faq.html">
-      <span class="icon" aria-hidden="true">💬</span>
-      <h3>よくある質問</h3>
-      <p class="muted small">費用、認定、施設入所、仕事との両立など、よく聞かれる疑問。</p>
-    </a>
-    <a class="card" href="search.html">
-      <span class="icon" aria-hidden="true">🔍</span>
-      <h3>全国の事業所検索</h3>
-      <p class="muted small">国のデータから、ケアマネ事業所・訪問看護・デイサービス・特養などを地域と名前で検索。</p>
-    </a>
-    <a class="card" href="jigyo.html">
-      <span class="icon" aria-hidden="true">🏢</span>
-      <h3>事業者向け：指定要件</h3>
-      <p class="muted small">介護事業を始めるための法人・人員・設備・運営の基準と申請の流れ。</p>
-    </a>
-  </div>
 
   <h2>都道府県から探す</h2>
   <div class="chips" id="pref-links"></div>
@@ -99,6 +78,16 @@
     var code = String(i + 1).padStart(2, "0");
     return '<a class="chip" href="area/' + code + '/">' + p + "</a>";
   }).join("");
+  var sel = document.getElementById("quick-pref");
+  prefs.forEach(function (p, i) {
+    var o = document.createElement("option");
+    o.value = String(i + 1).padStart(2, "0");
+    o.textContent = p;
+    sel.appendChild(o);
+  });
+  document.getElementById("quick").addEventListener("submit", function () {
+    if (sel.value) location.href = "area/" + sel.value + "/";
+  });
 })();
 </script>
 </body>

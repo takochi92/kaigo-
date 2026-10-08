@@ -7,7 +7,7 @@
 
   var pages = [
     ["index.html", "トップ"],
-    ["search.html", "全国の事業所検索"],
+    ["search.html", "事業所・病院検索"],
     ["seido.html", "介護保険のしくみ"],
     ["shisetsu-shurui.html", "施設・サービスの種類"],
     ["shisetsu.html", "相談窓口"],
@@ -61,6 +61,15 @@
     });
   }
 
+  // ページ内リンクの行き先が折りたたみの中なら開く
+  function openTarget() {
+    var id = decodeURIComponent(location.hash.slice(1));
+    var el = id && document.getElementById(id);
+    if (el && el.tagName === "DETAILS") el.open = true;
+  }
+  window.addEventListener("hashchange", openTarget);
+  openTarget();
+
   var footer = document.getElementById("site-footer");
   if (footer) {
     footer.className = "site-footer";
@@ -70,7 +79,7 @@
       "制度・料金・人員基準は改定や自治体によって変わります。最終的な判断は、市区町村の介護保険窓口、地域包括支援センター、" +
       '<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/kaigo_koureisha/index.html" target="_blank" rel="noopener">厚生労働省</a>、' +
       "指定権者（都道府県・市区町村）の最新情報でご確認ください。</p>" +
-      '<p>事業所データの出典：厚生労働省「<a href="https://www.mhlw.go.jp/stf/kaigo-kouhyou_opendata.html" target="_blank" rel="noopener">介護サービス情報公表システム オープンデータ</a>」（当サイトで加工して掲載）</p>' +
+      '<p>事業所データの出典：厚生労働省「<a href="https://www.mhlw.go.jp/stf/kaigo-kouhyou_opendata.html" target="_blank" rel="noopener">介護サービス情報公表システム オープンデータ</a>」、「<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iryou/newpage_43373.html" target="_blank" rel="noopener">医療情報ネット オープンデータ</a>」（当サイトで加工して掲載）</p>' +
       "<p>© かいごナビ</p>" +
       "</div>";
   }

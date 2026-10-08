@@ -57,10 +57,11 @@
     if (f.fax) rows += "<dt>FAX</dt><dd>" + esc(f.fax) + "</dd>";
     if (f.corp) rows += "<dt>法人</dt><dd>" + esc(f.corp) + "</dd>";
     if (f.capacity) rows += "<dt>定員</dt><dd>" + esc(f.capacity) + "</dd>";
+    if (f.depts) rows += "<dt>診療科</dt><dd>" + esc(f.depts) + "</dd>";
     if (here && f.lat && f.lng) rows += "<dt>距離</dt><dd>約" + distanceKm(here, [f.lat, f.lng]).toFixed(1) + "km</dd>";
 
     var btns = "";
-    if (f.tel) btns += '<a class="btn tel" href="tel:' + esc(f.tel.replace(/[^0-9+]/g, "")) + '">📞 電話する</a>';
+    if (f.tel) btns += '<a class="btn tel" href="tel:' + esc(f.tel.replace(/[^0-9+]/g, "")) + '">電話する</a>';
     var mq = f.lat && f.lng ? f.lat + "," + f.lng : f.address;
     btns += '<a class="btn secondary" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(mq) + '">地図</a>';
     if (f.url) btns += '<a class="btn secondary" target="_blank" rel="noopener nofollow" href="' + esc(f.url) + '">ホームページ</a>';
@@ -93,7 +94,7 @@
       if (cat !== -1 && r[F.cats].indexOf(cat) === -1) return false;
       if (!words.length) return true;
       var hay = (r[F.name] + " " + r[F.corp] + " " + r[F.address] + " " +
-        r[F.services].map(function (s) { return data.services[s]; }).join(" ")).toLowerCase();
+        r[F.services].map(function (s) { return data.services[s]; }).join(" ") + " " + (r[F.depts] || "")).toLowerCase();
       return words.every(function (w) { return hay.indexOf(w) !== -1; });
     });
     if (here) {
@@ -112,7 +113,7 @@
     var p = new URLSearchParams();
     if (prefSel.value) p.set("pref", prefSel.value);
     if (data && citySel.value !== "") p.set("city", data.cities[Number(citySel.value)].slug);
-    if (activeCat !== "") p.set("cat", activeCat);
+    if (activeCat !== "") p.set("cat", areas.categories[Number(activeCat)].id);
     if (q.value.trim()) p.set("q", q.value.trim());
     var s = p.toString();
     history.replaceState(null, "", location.pathname + (s ? "?" + s : ""));
@@ -173,7 +174,11 @@
       prefSel.appendChild(opt);
     });
     var cat = params.get("cat");
-    if (cat !== null && a.categories[Number(cat)]) activeCat = cat;
+    if (cat !== null) {
+      var ci = a.categories.findIndex(function (c) { return c.id === cat; });
+      if (ci === -1 && /^\d+$/.test(cat) && a.categories[Number(cat)]) ci = Number(cat);
+      if (ci !== -1) activeCat = String(ci);
+    }
     renderCats();
     q.value = params.get("q") || "";
     var pref = params.get("pref");
