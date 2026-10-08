@@ -426,13 +426,18 @@ details.section .grid { padding: 14px; }
 /* ---------- まんが ---------- */
 .cast { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; }
 .cast-item { display: flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); padding: 4px 10px 4px 4px; font-size: .85rem; }
-.cast-item svg { width: 44px; height: 46px; background: var(--primary-soft); }
+.cast-face { width: 46px; height: 50px; overflow: hidden; background: var(--primary-soft); display: block; position: relative; }
+.cast-face img { position: absolute; left: 50%; top: 3px; height: 170px; width: auto; max-width: none; transform: translateX(-50%); }
 .episode h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
 .panels { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 760px) { .panels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .panel { margin: 0; border: 2px solid var(--text); background: var(--surface); }
-.scene { position: relative; aspect-ratio: 4 / 3; max-width: 100%; overflow: hidden; border-bottom: 2px solid var(--text); }
+.scene { position: relative; aspect-ratio: 1 / 1; max-width: 100%; overflow: hidden; border-bottom: 2px solid var(--text); }
 .scene svg { display: block; width: 100%; height: 100%; }
+.actor { position: absolute; bottom: 3%; width: auto; max-width: none; z-index: 0; pointer-events: none; }
+.bubble .who { display: block; font-size: .72em; font-weight: 700; color: var(--accent-text); }
+.bubble.tail-off::after { display: none; }
+.bubble.tail-off { border-color: var(--accent); }
 .koma {
   position: absolute; right: 0; bottom: 0; z-index: 2;
   background: var(--text); color: var(--bg);
