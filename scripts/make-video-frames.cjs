@@ -77,7 +77,7 @@ const CSS = `
           : ep.id === "ep2"
             ? '<img src="assets/manga/caremane.png"><img src="assets/manga/musume.png"><img class="s" src="assets/manga/obaachan.png">'
             : '<img src="assets/manga/musume-worry.png"><img class="s" src="assets/manga/obaachan.png">';
-      ig.innerHTML = `<div class="slide cover"><span class="ep">まんがでわかる介護 第${no}話</span><h1>${ep.title.replace(/^第[0-9]+話[\s　]*/, "")}</h1><p class="sub">${ep.sub}</p><div class="who">${who}</div><div class="brand">おやのて<br>@kaigonavi</div></div>`;
+      ig.innerHTML = `<div class="slide cover"><span class="ep">まんがでわかる介護 第${no}話</span><h1>${ep.title.replace(/^第[0-9]+話[\s　]*/, "")}</h1><p class="sub">${ep.sub}</p><div class="who">${who}</div><div class="brand">おやのて<br>oyanote-care.com</div></div>`;
     }, { ep, no });
     await shot(`ep${no}-01`);
 
@@ -101,7 +101,7 @@ const CSS = `
 
     // まとめ
     await p.evaluate(({ ep, no, total }) => {
-      document.getElementById("ig").innerHTML = `<div class="slide end"><div class="bar" style="margin:-24px -22px 18px"><span>第${no}話のポイント</span><span class="n">${total}/${total}</span></div><h2>この話のポイント</h2><ul>${ep.points.map((t) => `<li>${t}</li>`).join("")}</ul><div class="go">相談先・全国の介護事業所と病院の検索、ほかのお話は<br><b>プロフィールのリンク（おやのて）</b>から見られます。</div><div class="acc">おやのて @kaigonavi ／ 編集部がやさしく解説</div></div>`;
+      document.getElementById("ig").innerHTML = `<div class="slide end"><div class="bar" style="margin:-24px -22px 18px"><span>第${no}話のポイント</span><span class="n">${total}/${total}</span></div><h2>この話のポイント</h2><ul>${ep.points.map((t) => `<li>${t}</li>`).join("")}</ul><div class="go">相談先・全国の介護事業所と病院の検索、ほかのお話は<br><b>プロフィールのリンク（おやのて）</b>から見られます。</div><div class="acc">おやのて oyanote-care.com ／ 編集部がやさしく解説</div></div>`;
     }, { ep, no, total });
     await shot(`ep${no}-${String(total).padStart(2, "0")}`);
   }

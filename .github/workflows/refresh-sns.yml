@@ -1,0 +1,58 @@
+name: Refresh Oyanote SNS materials
+on:
+  push:
+    branches: [ccr-0d9e948d-9nfoh6]
+    paths:
+      - '.github/workflows/refresh-sns.yml'
+      - 'scripts/make-instagram.cjs'
+      - 'scripts/make-video-frames.cjs'
+      - 'scripts/make-video.py'
+      - 'manga.html'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: refresh-sns
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install rendering tools
+        run: |
+          npm install --no-save --package-lock=false playwright@1.62.1
+          npx playwright install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y fonts-ipafont-gothic ffmpeg
+      - name: Render updated images and videos
+        run: |
+          python3 -m http.server 8769 --bind 127.0.0.1 > /tmp/oyanote-sns-server.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://localhost:8769/manga.html > /dev/null; then break; fi
+            sleep 1
+          done
+          export PWPATH="$PWD/node_modules/playwright"
+          node scripts/make-instagram.cjs
+          node scripts/make-video-frames.cjs
+          python3 scripts/make-video.py
+      - name: Save updated materials
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add sns/instagram/*.png sns/video/*.mp4
+          if ! git diff --cached --quiet; then
+            git commit -m 'Refresh Oyanote social images and videos'
+            git pull --rebase origin "$GITHUB_REF_NAME"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oyanote-sns-materials
+          path: |
+            sns/instagram/*.png
+            sns/video/*.mp4
