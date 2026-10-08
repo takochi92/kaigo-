@@ -65,7 +65,7 @@
       return words.every(function (w) { return hay.indexOf(w) !== -1; });
     });
     list.innerHTML = hits.length ? hits.map(card).join("") :
-      '<p class="muted">該当する施設が見つかりませんでした。キーワードを変えるか、<a href="https://www.kaigokensaku.mhlw.go.jp/" target="_blank" rel="noopener">介護サービス情報公表システム</a>で検索してください。</p>';
+      '<p class="muted">該当する相談窓口が見つかりませんでした。キーワードを変えるか、<a href="https://www.kaigokensaku.mhlw.go.jp/" target="_blank" rel="noopener">介護サービス情報公表システム</a>で検索してください。</p>';
     count.textContent = hits.length + "件を表示しています";
 
     var next = new URLSearchParams();

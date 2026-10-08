@@ -74,7 +74,11 @@
   var WEEKS = 4.3;
   var $ = function (id) { return document.getElementById(id); };
   var yen = function (n) { return Math.round(n).toLocaleString() + "円"; };
-  var num = function (id) { var v = Number($(id).value); return isFinite(v) && v > 0 ? v : 0; };
+  var num = function (id) {
+    var input = $(id), v = Number(input.value);
+    if (!isFinite(v) || v < 0) return 0;
+    return input.max ? Math.min(v, Number(input.max)) : v;
+  };
 
   function calc() {
     var lv = Number($("level").value), ratio = Number($("ratio").value), price = Number($("price").value);
@@ -91,18 +95,20 @@
     var inside = Math.min(units, limit), over = Math.max(0, units - limit);
     var total = units * price;
     var self = inside * price * ratio + over * price;
-    var pct = Math.min(100, Math.round(units / limit * 100));
+    var pct = Math.round(units / limit * 100);
+    var meterPct = Math.min(100, pct);
     $("result").innerHTML =
       '<div class="res-main"><span class="muted small">1か月の自己負担の目安</span><strong>' + yen(self) + '</strong><span class="muted small">（サービス費用の総額 約' + yen(total) + '）</span></div>' +
-      '<div class="meter" role="img" aria-label="上限に対する使用割合 ' + pct + '%"><span style="width:' + pct + '%"></span></div>' +
+      '<div class="meter" role="img" aria-label="上限に対する使用割合 ' + pct + '%"><span style="width:' + meterPct + '%"></span></div>' +
       '<p class="small" style="margin:6px 0 12px">上限（要介護' + lv + '：' + limit.toLocaleString() + '単位）のうち <strong>' + pct + '%</strong> を使っています。' +
       (over > 0 ? '<br><strong style="color:var(--accent-text)">上限を約' + Math.round(over).toLocaleString() + '単位こえています。こえた分（約' + yen(over * price) + '）は全額自己負担です。</strong>' :
         ' あと約' + Math.round(limit - units).toLocaleString() + '単位（約' + yen((limit - units) * price) + '分）使えます。') + '</p>' +
-      '<div class="table-wrap"><table><thead><tr><th>サービス</th><th>単位/月</th><th>自己負担の目安</th></tr></thead><tbody>' +
+      '<div class="table-wrap"><table><thead><tr><th>サービス</th><th>単位/月</th><th>限度額内での自己負担</th></tr></thead><tbody>' +
       rows.filter(function (r) { return r[1] > 0; }).map(function (r) {
         return '<tr><td>' + r[0] + '</td><td class="num">' + Math.round(r[1]).toLocaleString() + '</td><td class="num">' + yen(r[1] * price * ratio) + '</td></tr>';
       }).join("") + '</tbody></table></div>' +
-      (self > 44400 ? '<div class="tip">自己負担が月44,400円（一般的な所得の世帯の上限）をこえる場合は、申請すると「高額介護サービス費」で超えた分が戻ってくることがあります（上限額は所得で変わります）。</div>' : "");
+      (over > 0 ? '<p class="small muted">表の内訳はすべて限度額内で利用した場合の金額です。上限超過分を含む実際の負担は上の合計額をご覧ください。</p>' : '') +
+      '<div class="tip">保険対象の自己負担が所得区分ごとの上限を超える場合は、「高額介護サービス費」で払い戻しを受けられることがあります。区分支給限度額を超えた全額自己負担分や食費・部屋代などは対象外です。<a href="seido.html#relief">負担を軽くする制度</a>もご確認ください。</div>';
   }
   document.getElementById("calc").addEventListener("input", calc);
   calc();

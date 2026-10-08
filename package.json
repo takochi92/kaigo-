@@ -4,11 +4,14 @@
   "private": true,
   "description": "介護の制度・相談窓口・全国の介護事業所検索サイト",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "node scripts/build.mjs",
     "manga": "node scripts/make-manga.mjs",
     "articles": "node scripts/make-articles.mjs",
-    "serve": "python3 -m http.server 8000 -d dist"
+    "serve": "python3 -m http.server 8000 -d dist",
+    "test": "node --test tests/*.test.mjs"
   }
 }

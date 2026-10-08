@@ -18,6 +18,7 @@
   var here = null; // 現在地 [lat, lng]
 
   var params = new URLSearchParams(location.search);
+  var loadVersion = 0;
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -120,12 +121,18 @@
   }
 
   function loadPref(code, citySlug) {
+    var version = ++loadVersion;
     data = null;
+    results.innerHTML = "";
+    hits = [];
+    shown = 0;
+    more.hidden = true;
     citySel.innerHTML = '<option value="">市区町村（すべて）</option>';
     citySel.disabled = true;
     if (!code) { status.textContent = "都道府県を選んでください。"; search(); return; }
     status.textContent = "読み込み中…";
     getJson("data/pref/" + code + ".json").then(function (d) {
+      if (version !== loadVersion) return;
       data = d;
       d.cities.forEach(function (c, i) {
         var opt = document.createElement("option");
@@ -137,6 +144,7 @@
       citySel.disabled = false;
       search();
     }).catch(function () {
+      if (version !== loadVersion) return;
       status.textContent = "データを読み込めませんでした。時間をおいてもう一度お試しください。";
     });
   }
@@ -154,6 +162,13 @@
     search();
   });
   nearBtn.addEventListener("click", function () {
+    if (here) {
+      here = null;
+      nearBtn.setAttribute("aria-pressed", "false");
+      if (data) search();
+      else status.textContent = "都道府県を選んでください。";
+      return;
+    }
     if (!navigator.geolocation) { status.textContent = "この端末では現在地を使えません。"; return; }
     status.textContent = "現在地を確認しています…";
     navigator.geolocation.getCurrentPosition(function (pos) {

@@ -43,6 +43,7 @@
   var key = "kaigo-kengaku";
   var state = {};
   try { state = JSON.parse(localStorage.getItem(key) || "{}"); } catch (e) {}
+  if (!state || typeof state !== "object" || Array.isArray(state)) state = {};
   var save = function () { try { localStorage.setItem(key, JSON.stringify(state)); } catch (e) {} };
   var list = document.getElementById("list"), name = document.getElementById("name");
   name.value = state.name || "";
@@ -60,7 +61,10 @@
   list.addEventListener("change", function (e) {
     var k = e.target.getAttribute("data-k");
     if (!k) return;
-    state[k] = e.target.checked; save(); render();
+    state[k] = e.target.checked; save();
+    var gi = Number(k.split("-")[0]);
+    var done = G[gi][1].filter(function (_, i) { return state[gi + "-" + i]; }).length;
+    list.querySelectorAll(".count")[gi].textContent = done + "/" + G[gi][1].length;
   });
   document.getElementById("reset").addEventListener("click", function () {
     state = { name: "" }; name.value = ""; save(); render();

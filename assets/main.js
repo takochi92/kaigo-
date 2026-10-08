@@ -65,9 +65,14 @@
 
   // ページ内リンクの行き先が折りたたみの中なら開く
   function openTarget() {
-    var id = decodeURIComponent(location.hash.slice(1));
+    var id;
+    try { id = decodeURIComponent(location.hash.slice(1)); } catch (e) { return; }
     var el = id && document.getElementById(id);
-    if (el && el.tagName === "DETAILS") el.open = true;
+    if (el) {
+      for (var parent = el; parent; parent = parent.parentElement) {
+        if (parent.tagName === "DETAILS") parent.open = true;
+      }
+    }
   }
   window.addEventListener("hashchange", openTarget);
   openTarget();

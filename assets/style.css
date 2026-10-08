@@ -252,7 +252,11 @@ a.card:hover { border-color: var(--primary); }
 .table-wrap { overflow-x: auto; margin: 10px 0 18px; border: 1px solid var(--line); border-radius: 0; }
 table { border-collapse: collapse; width: 100%; background: var(--surface); font-size: .94rem; }
 th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
-th { background: var(--surface-2); white-space: nowrap; }
+th { background: var(--surface-2); overflow-wrap: anywhere; }
+td { overflow-wrap: anywhere; }
+/* Row-heading tables must leave room for the explanation on narrow screens. */
+.table-wrap table:not(:has(tr > :nth-child(3))) tbody th { width: 40%; }
+.table-wrap table:has(tr > :nth-child(3)) { min-width: 36rem; }
 tr:last-child td { border-bottom: none; }
 td.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 
@@ -493,3 +497,28 @@ label.check { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0;
 label.check:last-child { border-bottom: none; }
 label.check input { width: 22px; height: 22px; flex: none; margin-top: 2px; }
 .tile[aria-current="true"] { background: var(--accent-soft); outline: 3px solid var(--accent); outline-offset: -3px; }
+
+/* Keep navigation, forms and cards usable on small screens and with large text. */
+:where(h1, h2, h3, p, .btn, .chip, .toc a) { overflow-wrap: anywhere; }
+[id] { scroll-margin-top: 9rem; }
+.grid { grid-template-columns: repeat(auto-fill, minmax(min(230px, 100%), 1fr)); }
+.calc-grid { grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); }
+.search-bar > input, .search-bar > select, .quick select { min-width: 0; max-width: 100%; }
+.facility dl { grid-template-columns: auto minmax(0, 1fr); }
+button:focus-visible, summary:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.font-btn, .nav-toggle, .chip, .toc a { min-height: 44px; }
+@media (max-width: 480px) {
+  .site-header .wrap { gap: 6px; padding-top: 6px; padding-bottom: 6px; }
+  .logo { font-size: 1rem; gap: 5px; }
+  .logo-mark { width: 28px; height: 28px; flex: none; }
+  .font-btn, .nav-toggle { padding: 4px 7px; font-size: .75rem; }
+  html.font-lg .logo { font-size: .9rem; }
+  .tiles { grid-template-columns: minmax(0, 1fr); }
+  th, td { padding: 8px; }
+  .table-wrap table:not(:has(tr > :nth-child(3))) tbody th { width: 40%; }
+  td.num { white-space: normal; }
+}
+@media print {
+  .scene, .panel, .card { break-inside: avoid; }
+  .table-wrap { overflow: visible; }
+}
