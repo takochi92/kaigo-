@@ -422,3 +422,48 @@ details.section[open] > summary h2::after { content: "－"; }
 details.section > summary:hover { background: var(--surface-2); }
 details.section .grid { padding: 14px; }
 .count { white-space: nowrap; font-size: .85rem; font-weight: 400; color: var(--muted); }
+
+/* ---------- まんが ---------- */
+.cast { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; }
+.cast-item { display: flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); padding: 4px 10px 4px 4px; font-size: .85rem; }
+.cast-item svg { width: 44px; height: 46px; background: var(--primary-soft); }
+.episode h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.panels { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 760px) { .panels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.panel { margin: 0; border: 2px solid var(--text); background: var(--surface); }
+.scene { position: relative; aspect-ratio: 4 / 3; max-width: 100%; overflow: hidden; border-bottom: 2px solid var(--text); }
+.scene svg { display: block; width: 100%; height: 100%; }
+.koma {
+  position: absolute; right: 0; bottom: 0; z-index: 2;
+  background: var(--text); color: var(--bg);
+  font-size: .75rem; font-weight: 700; padding: 1px 7px;
+}
+.bubble {
+  position: absolute; z-index: 1; margin: 0;
+  background: #fff; color: #2b3027;
+  border: 2px solid #2b3027;
+  border-radius: 1.2em;
+  padding: .35em .7em;
+  font-size: clamp(.72rem, 2.6vw, .9rem);
+  line-height: 1.45;
+  font-weight: 700;
+}
+@media (min-width: 760px) { .bubble { font-size: .82rem; } }
+.bubble::after {
+  content: ""; position: absolute; bottom: -10px;
+  width: 0; height: 0;
+  border-left: 7px solid transparent; border-right: 7px solid transparent;
+  border-top: 10px solid #2b3027;
+}
+.bubble.tail-l::after { left: 22%; }
+.bubble.tail-r::after { right: 22%; }
+.bubble.think { border-style: dashed; font-weight: 400; background: #fffdf6; }
+.bubble.think::after { border-top-color: transparent; }
+.panel figcaption {
+  padding: 8px 12px;
+  background: var(--primary-soft);
+  font-size: .88rem;
+  line-height: 1.7;
+}
+.episode .tip ul { margin: 6px 0 10px; padding-left: 1.2em; }
+.episode .tip .btn { min-height: 40px; padding: 6px 12px; font-size: .9rem; }

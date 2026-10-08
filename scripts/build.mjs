@@ -187,7 +187,7 @@ function normalizeRows(rows, fallbackService) {
 async function fetchWithRetry(url, tries = 4) {
   for (let i = 0; ; i++) {
     try {
-      const res = await fetch(url, { headers: { "User-Agent": "kaigo-navi-builder" } });
+      const res = await fetch(url, { headers: { "User-Agent": "kaigo-navi-builder" }, signal: AbortSignal.timeout(180000) });
       if (!res.ok) throw new Error(`HTTP ${res.status} ${url}`);
       return Buffer.from(await res.arrayBuffer());
     } catch (err) {
@@ -251,7 +251,11 @@ async function loadMedicalSources() {
     const links = collectLinks(html, MED_DATA_PAGE, /\.(zip|csv)(\?|$)/i);
     if (!links.length) throw new Error("医療情報ネットのデータへのリンクが見つかりませんでした。");
     console.log(`医療データ ${links.length} ファイルを取得します`);
-    for (const url of links) raw.push({ label: url, buf: await fetchWithRetry(url) });
+    for (const url of links) {
+      const buf = await fetchWithRetry(url);
+      raw.push({ label: url, buf });
+      console.log(`  取得 ${path.basename(url)} (${Math.round(buf.length / 1024)}KB)`);
+    }
   }
   const files = [];
   for (const r of raw) {
@@ -366,10 +370,10 @@ async function loadSources() {
   console.log(`CSV ${links.length} 件を取得します`);
   const sources = [];
   for (const url of links) {
-    sources.push({ label: url, buf: await fetchWithRetry(url) });
-    process.stdout.write(".");
+    const buf = await fetchWithRetry(url);
+    sources.push({ label: url, buf });
+    console.log(`  取得 ${path.basename(url)} (${Math.round(buf.length / 1024)}KB)`);
   }
-  process.stdout.write("\n");
   return sources;
 }
 
@@ -616,7 +620,7 @@ ${sections}
   write("data/areas.json", JSON.stringify({ builtAt, categories: categoryLabels, prefs: areas.map((a) => ({ code: a.code, name: a.name, count: a.count })) }));
 
   // sitemap / robots
-  for (const p of ["", "index.html", "search.html", "seido.html", "shisetsu-shurui.html", "shisetsu.html", "jigyo.html", "faq.html"]) {
+  for (const p of ["", "index.html", "search.html", "manga.html", "seido.html", "shisetsu-shurui.html", "shisetsu.html", "jigyo.html", "faq.html"]) {
     if (p !== "index.html") urls.unshift(`${SITE_URL}/${p}`);
   }
   const chunks = [];
