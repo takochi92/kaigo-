@@ -464,7 +464,8 @@ function groupOffices(records) {
 function copyStatic() {
   fs.rmSync(DIST, { recursive: true, force: true });
   fs.mkdirSync(DIST, { recursive: true });
-  const skip = new Set(["dist", "scripts", "node_modules", ".git", ".github", "README.md", "package.json", "package-lock.json", ".gitignore"]);
+  // claude/ は自分用の作業ログなのでサイトには載せない
+  const skip = new Set(["dist", "scripts", "node_modules", ".git", ".github", "README.md", "claude", "claude-data", "package.json", "package-lock.json", ".gitignore"]);
   for (const entry of fs.readdirSync(ROOT)) {
     if (skip.has(entry) || entry.startsWith(".")) continue;
     fs.cpSync(path.join(ROOT, entry), path.join(DIST, entry), { recursive: true });

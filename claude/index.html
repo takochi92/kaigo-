@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Claude 作業ログ</title>
+<meta name="description" content="Claude が毎日つくったファイルとデータの記録">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b0d12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Claudeログ">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="alternate" type="application/atom+xml" title="Claude 作業ログ" href="feed.xml">
+<link rel="stylesheet" href="claude.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><img src="icon.svg" alt=""><div>Claude 作業ログ<small>DAILY BUILD REPORT</small></div></div>
+    <span class="spacer"></span>
+    <span class="live" id="updated">読み込み中…</span>
+    <button class="pill-btn" id="notify-btn" type="button" aria-pressed="false">🔔 通知</button>
+    <a class="pill-btn" href="widget.html">📱 ウィジェット</a>
+  </header>
+
+  <section class="hero" id="hero">
+    <div class="eyebrow" id="hero-date">TODAY</div>
+    <h1 id="hero-title">読み込み中…</h1>
+    <p id="hero-sub"></p>
+    <div class="hero-stats">
+      <div class="hs coral"><b id="s-today">–</b><span>今日のコミット</span></div>
+      <div class="hs cyan"><b id="s-created">–</b><span>今日つくったファイル</span></div>
+      <div class="hs amber"><b id="s-streak">–</b><span>連続作業日数</span></div>
+      <div class="hs violet"><b id="s-total">–</b><span>これまでのコミット</span></div>
+    </div>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <h2>🔥 Activity <span class="count">直近12週</span></h2>
+      <div class="heat" id="heat"></div>
+      <div class="heat-legend"><span id="heat-from"></span><span>少 ▢▣■ 多</span><span>今日</span></div>
+    </section>
+
+    <section class="card">
+      <h2>🧩 作業の種類 <span class="count" id="kinds-total"></span></h2>
+      <div class="bars" id="bars"></div>
+    </section>
+
+    <section class="card span-2">
+      <h2>✅ Claude に頼んでいるタスク <span class="count" id="tasks-count"></span></h2>
+      <div class="tasks" id="tasks"></div>
+    </section>
+
+    <section class="card span-2">
+      <h2>🗓 Timeline <span class="count" id="tl-count"></span></h2>
+      <div class="filters" id="filters"></div>
+      <div id="timeline"></div>
+    </section>
+
+    <section class="card span-2" id="widget-howto">
+      <h2>📱 スマホのウィジェットにする</h2>
+      <div class="how">
+        <div class="step"><strong>iPhone：本物のウィジェット</strong>無料アプリ「Scriptable」を入れ、<a href="scriptable-widget.js">scriptable-widget.js</a> の中身を新しいスクリプトに貼り付け → ホーム画面を長押し → ＋ → Scriptable のウィジェットを置き、そのスクリプトを選びます。</div>
+        <div class="step"><strong>このページを見るには</strong>自分用なのでサイトには公開していません。パソコンで <code>npm run claude</code> を実行して <code>http://localhost:8001</code> を開くか、Claude に「作業ログを見せて」と頼んでください。</div>
+        <div class="step"><strong>毎日の通知</strong>毎朝8時ごろ、前日の作業が GitHub の Issue で届きます（GitHub アプリでプッシュ通知）。このページを開いたときも、前回から増えた作業をお知らせします。</div>
+      </div>
+    </section>
+  </div>
+
+  <p class="foot" id="foot"></p>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
