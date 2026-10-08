@@ -522,3 +522,7 @@ button:focus-visible, summary:focus-visible { outline: 3px solid var(--primary);
   .scene, .panel, .card { break-inside: avoid; }
   .table-wrap { overflow: visible; }
 }
+
+.skip-link { position: absolute; left: 12px; top: -100px; background: #fff; padding: 8px 12px; z-index: 20; }
+.skip-link:focus { top: 8px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }

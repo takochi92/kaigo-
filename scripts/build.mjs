@@ -465,7 +465,7 @@ function groupOffices(records) {
 function copyStatic() {
   fs.rmSync(DIST, { recursive: true, force: true });
   fs.mkdirSync(DIST, { recursive: true });
-  const skip = new Set(["content", "CLAUDE.md", "sns", "site.config.json", "dist", "scripts", "node_modules", ".git", ".github", "README.md", "package.json", "package-lock.json", ".gitignore"]);
+  const skip = new Set(["content", "tests", "docs", "csv", "CLAUDE.md", "sns", "site.config.json", "dist", "scripts", "node_modules", ".git", ".github", "README.md", "package.json", "package-lock.json", ".gitignore"]);
   for (const entry of fs.readdirSync(ROOT)) {
     if (skip.has(entry) || entry.startsWith(".")) continue;
     fs.cpSync(path.join(ROOT, entry), path.join(DIST, entry), { recursive: true });
@@ -488,10 +488,14 @@ function addShareTags() {
     const ga = /^G-[A-Z0-9]+$/.test(SITE_CONFIG.gaId || "") && !html.includes("googletagmanager.com/gtag")
       ? `<script async src="https://www.googletagmanager.com/gtag/js?id=${SITE_CONFIG.gaId}"></script>\n<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","${SITE_CONFIG.gaId}");</script>`
       : "";
-    if (ga) html = html.replace("</head>", ga + "\n</head>");
-    if (html.includes('property="og:image"')) { fs.writeFileSync(file, html); continue; }
     const rel = path.relative(DIST, file).split(path.sep).join("/");
     const url = `${SITE_URL}/${rel.replace(/(^|\/)index\.html$/, "$1")}`;
+    if (!html.includes('rel="canonical"')) html = html.replace("</head>", `<link rel="canonical" href="${esc(url)}">\n</head>`);
+    const up = "../".repeat(rel.split("/").length - 1);
+    const root = rel === "404.html" ? `${SITE_URL}/` : up;
+    html = html.replace('<header id="site-header"></header>', `<header id="site-header" class="site-header"><div class="wrap"><a class="logo" href="${root}index.html">かいごナビ</a><nav aria-label="基本メニュー"><a href="${root}tsugi.html">次にやること</a>　<a href="${root}search.html">事業所検索</a>　<a href="${root}shisetsu.html">相談窓口</a>　<a href="${root}about.html">運営者情報</a></nav></div></header>`);
+    if (ga) html = html.replace("</head>", ga + "\n</head>");
+    if (html.includes('property="og:image"')) { fs.writeFileSync(file, html); continue; }
     const title = (html.match(/<title>([^<]*)<\/title>/) || [])[1] || "かいごナビ";
     const desc = (html.match(/<meta name="description" content="([^"]*)"/) || [])[1] || "";
     const tags = [
@@ -712,7 +716,7 @@ ${parentPages.length ? `<h2>政令指定都市（区ごと）</h2><div class="ch
   // 読みもの（yomimono/）のページもサイトマップに入れる
   const yomi = fs.existsSync(path.join(ROOT, "yomimono")) ? fs.readdirSync(path.join(ROOT, "yomimono")).filter((f) => f.endsWith(".html")).sort().reverse() : [];
   for (const f of yomi) urls.unshift(`${SITE_URL}/yomimono/${f === "index.html" ? "" : f}`);
-  for (const p of ["", "index.html", "search.html", "manga.html", "seido.html", "shisetsu-shurui.html", "shisetsu.html", "jigyo.html", "faq.html", "yougo.html", "tsugi.html", "hiyou.html", "kengaku.html", "about.html", "policy.html"]) {
+  for (const p of ["", "index.html", "search.html", "manga.html", "seido.html", "shisetsu-shurui.html", "shisetsu.html", "jigyo.html", "faq.html", "yougo.html", "tsugi.html", "hiyou.html", "kengaku.html", "about.html", "policy.html", "contact.html", "share.html", "sources.html"]) {
     if (p !== "index.html") urls.unshift(`${SITE_URL}/${p}`);
   }
   const chunks = [];

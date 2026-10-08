@@ -12,6 +12,7 @@
     "manga": "node scripts/make-manga.mjs",
     "articles": "node scripts/make-articles.mjs",
     "serve": "python3 -m http.server 8000 -d dist",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "check": "node scripts/check-site.mjs"
   }
 }

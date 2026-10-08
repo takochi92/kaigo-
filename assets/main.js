@@ -14,7 +14,8 @@
     ["shisetsu-shurui.html", "施設・サービスの種類"],
     ["shisetsu.html", "相談窓口"],
     ["jigyo.html", "事業者向け 指定要件"],
-    ["faq.html", "よくある質問"]
+    ["faq.html", "よくある質問"],
+    ["share.html", "紹介・配布"]
   ];
   var here = location.href.split(/[?#]/)[0];
   if (/\/$/.test(here)) here += "index.html";
@@ -25,11 +26,13 @@
     return '<a href="' + href + '"' + cur + ">" + p[1] + "</a>";
   }).join("");
 
+  var main = document.querySelector ? document.querySelector("main") : null;
+  if (main && !main.id) main.id = "main-content";
   var header = document.getElementById("site-header");
   if (header) {
     header.className = "site-header";
     header.innerHTML =
-      '<div class="wrap">' +
+      '<a class="skip-link" href="#main-content">本文へ移動</a><div class="wrap">' +
       '<a class="logo" href="' + base + 'index.html"><span class="logo-mark" aria-hidden="true">介</span>かいごナビ</a>' +
       '<button class="font-btn" id="font-btn" type="button" aria-pressed="false">文字 大</button>' +
       '<button class="nav-toggle" id="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">メニュー</button>' +
@@ -45,6 +48,13 @@
     toggle.addEventListener("click", function () {
       var open = siteNav.classList.toggle("open");
       toggle.setAttribute("aria-expanded", String(open));
+    });
+
+    toggle.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") { siteNav.classList.remove("open"); toggle.setAttribute("aria-expanded", "false"); }
+    });
+    siteNav.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") { siteNav.classList.remove("open"); toggle.setAttribute("aria-expanded", "false"); toggle.focus(); }
     });
 
     var fontBtn = document.getElementById("font-btn");
@@ -87,6 +97,7 @@
       '<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/kaigo_koureisha/index.html" target="_blank" rel="noopener">厚生労働省</a>、' +
       "指定権者（都道府県・市区町村）の最新情報でご確認ください。</p>" +
       '<p>事業所データの出典：厚生労働省「<a href="https://www.mhlw.go.jp/stf/kaigo-kouhyou_opendata.html" target="_blank" rel="noopener">介護サービス情報公表システム オープンデータ</a>」、「<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iryou/newpage_43373.html" target="_blank" rel="noopener">医療情報ネット オープンデータ</a>」（当サイトで加工して掲載）</p>' +
+      '<p><a href="' + base + 'sources.html">出典・編集方針</a>　<a href="' + base + 'share.html">紹介・配布</a>　<a href="' + base + 'contact.html">お問い合わせ・訂正</a></p>' +
       '<p><a href="' + base + 'tsugi.html">次にやること案内</a>　<a href="' + base + 'hiyou.html">自己負担の計算</a>　<a href="' + base + 'kengaku.html">施設見学チェックリスト</a>　<a href="' + base + 'yougo.html">用語集</a>　<a href="' + base + 'about.html">このサイトについて・運営者情報</a>　<a href="' + base + 'policy.html">プライバシーポリシー・免責事項</a>　<a href="https://docs.google.com/forms/d/1Q9pIKgnPZdZeB-6XsWSoyjGqBBqIUtSKXlVnkmED6Hg/viewform" target="_blank" rel="noopener">お問い合わせ</a></p>' +
       "<p>© かいごナビ</p>" +
       "</div>";
