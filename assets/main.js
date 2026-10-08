@@ -98,7 +98,7 @@
       "指定権者（都道府県・市区町村）の最新情報でご確認ください。</p>" +
       '<p>事業所データの出典：厚生労働省「<a href="https://www.mhlw.go.jp/stf/kaigo-kouhyou_opendata.html" target="_blank" rel="noopener">介護サービス情報公表システム オープンデータ</a>」、「<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iryou/newpage_43373.html" target="_blank" rel="noopener">医療情報ネット オープンデータ</a>」（当サイトで加工して掲載）</p>' +
       '<p><a href="' + base + 'sources.html">出典・編集方針</a>　<a href="' + base + 'share.html">紹介・配布</a>　<a href="' + base + 'contact.html">お問い合わせ・訂正</a></p>' +
-      '<p><a href="' + base + 'tsugi.html">次にやること案内</a>　<a href="' + base + 'hiyou.html">自己負担の計算</a>　<a href="' + base + 'kengaku.html">施設見学チェックリスト</a>　<a href="' + base + 'yougo.html">用語集</a>　<a href="' + base + 'about.html">このサイトについて・運営者情報</a>　<a href="' + base + 'policy.html">プライバシーポリシー・免責事項</a>　<a href="https://docs.google.com/forms/d/1Q9pIKgnPZdZeB-6XsWSoyjGqBBqIUtSKXlVnkmED6Hg/viewform" target="_blank" rel="noopener">お問い合わせ</a></p>' +
+      '<p><a href="' + base + 'tsugi.html">次にやること案内</a>　<a href="' + base + 'hiyou.html">自己負担の計算</a>　<a href="' + base + 'kengaku.html">施設見学チェックリスト</a>　<a href="' + base + 'yougo.html">用語集</a>　<a href="' + base + 'about.html">このサイトについて・運営者情報</a>　<a href="' + base + 'policy.html">プライバシーポリシー・免責事項</a>　<a href="https://docs.google.com/forms/d/e/1FAIpQLSdJhFLMeFev3Il-ncBg1lLS5uhkh1U0EDWpnrQMb4zLgxcZWg/viewform" target="_blank" rel="noopener">お問い合わせ</a></p>' +
       "<p>© かいごナビ</p>" +
       "</div>";
   }
