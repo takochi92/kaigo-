@@ -17,6 +17,8 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&l
 // h: コマの高さに対する身長（%）。画像はすべて高さ640px。
 const PEOPLE = {
   sakura: { img: "musume", label: "娘のさくら", h: 70 },
+  "sakura-worry": { img: "musume-worry", label: "娘のさくら（困り顔）", h: 70, hidden: true },
+  "sakura-cry": { img: "musume-cry", label: "娘のさくら（泣き顔）", h: 70, hidden: true },
   hanako: { img: "obaachan", label: "母のはなこ", h: 64 },
   masao: { img: "ojiichan", label: "父のまさお", h: 67 },
   houkatsu: { img: "houkatsu", label: "包括の職員", h: 70 },
@@ -34,6 +36,14 @@ function actor(id, x) {
 }
 
 // ---------------------------------------------------------------- 背景
+
+// 写真の背景（assets/manga/bg/*.jpg）。pos は object-position（どこを中心に切り取るか）
+const PHOTO = {
+  living: { file: "living", pos: "45% 50%" },
+  kitchen: { file: "kitchen", pos: "60% 50%" },
+  hospital: { file: "hospital", pos: "40% 50%" },
+  houkatsu: { file: "houkatsu", pos: "50% 50%" }
+};
 
 const BG = {
   home: `<rect width="400" height="300" fill="#fffaf2"/><rect y="250" width="400" height="50" fill="#f0e2cc"/><rect x="292" y="34" width="78" height="70" fill="#e6f3fb" stroke="#c9b79c" stroke-width="3"/><path d="M331 34 V104 M292 69 H370" stroke="#c9b79c" stroke-width="3"/><rect x="18" y="200" width="22" height="50" fill="#b8d98a"/><circle cx="29" cy="190" r="16" fill="#a8d164"/>`,
@@ -58,31 +68,31 @@ const EPISODES = [
     sub: "相談から要介護認定の申請まで",
     panels: [
       {
-        bg: "home",
-        people: [["sakura", 22], ["hanako", 60]],
+        bg: "kitchen",
+        people: [["sakura-worry", 22], ["hanako", 60]],
         bubbles: [[2, 3, 47, "お母さん、最近よく転ぶし、料理もつらそう…", "l"], [52, 3, 45, "大丈夫よ〜、まだまだ元気！", "r"]],
         narr: "ひとり暮らしの母・はなこさん（82歳）。最近、転ぶことが増えてきました。"
       },
       {
-        bg: "home",
-        people: [["sakura", 42]],
+        bg: "living",
+        people: [["sakura-worry", 42]],
         bubbles: [[4, 3, 62, "まずは母の住む地域の「地域包括支援センター」に電話してみよう", "r", "think"]],
         narr: "介護の相談は、地域包括支援センターへ。相談は無料で、家族だけ・電話だけでも大丈夫です。"
       },
       {
-        bg: "office",
+        bg: "houkatsu",
         people: [["houkatsu", 14], ["sakura", 66]],
-        bubbles: [[2, 3, 58, "介護保険を使うには「要介護認定」の申請が必要です。代わりに申請もできますよ", "l"], [64, 16, 32, "お願いします！", "r"]],
+        bubbles: [[2, 13, 58, "介護保険を使うには「要介護認定」の申請が必要です。代わりに申請もできますよ", "l"], [64, 16, 32, "お願いします！", "r"]],
         narr: "申請は市区町村の窓口へ。センターやケアマネジャーが代わりに申請することもできます。申請にお金はかかりません。"
       },
       {
-        bg: "home",
-        people: [["hanako", 32], ["sakura", 66]],
+        bg: "living",
+        people: [["hanako", 32], ["sakura-worry", 66]],
         bubbles: [[4, 4, 44, "なんでも自分でできますよ！", "r"], [52, 4, 46, "（本当は夜、トイレで転んだの…）", "r", "think"]],
         narr: "調査員が家に来て、体や生活の様子を聞き取ります。本人は頑張ってしまいがち。ふだんの困りごとは家族が伝えましょう。"
       },
       {
-        bg: "home",
+        bg: "living",
         people: [["sakura", 24], ["hanako", 60]],
         bubbles: [[2, 3, 46, "結果が届いた！「要介護1」だって", "l"], [54, 3, 43, "これでサービスが使えるのね", "r"]],
         narr: "主治医の意見書とあわせて審査され、結果は原則30日以内に届きます。要支援1・2、要介護1〜5、非該当のどれかです。"
@@ -101,13 +111,13 @@ const EPISODES = [
     sub: "ケアプランづくりと在宅サービス",
     panels: [
       {
-        bg: "home",
+        bg: "living",
         people: [["caremane", 8], ["sakura", 46], ["hanako", 72]],
         bubbles: [[2, 3, 56, "ケアマネジャーの田中です。困っていることを教えてください", "l"]],
         narr: "要介護1〜5の人は、ケアマネジャーがいる「居宅介護支援事業所」を選んで契約します。ケアプラン作りの自己負担はありません。"
       },
       {
-        bg: "home",
+        bg: "living",
         people: [["hanako", 18], ["caremane", 64]],
         bubbles: [[2, 3, 44, "ひとりでお風呂に入るのがこわいのよ", "l"], [48, 3, 50, "デイサービスで入浴できますよ。送迎もあります", "r"]],
         narr: "本人・家族の希望を聞いて、どのサービスを週に何回使うかの計画（ケアプラン）を作ります。"
@@ -139,13 +149,13 @@ const EPISODES = [
     panels: [
       {
         bg: "night",
-        people: [["sakura", 40]],
+        people: [["sakura-cry", 40]],
         bubbles: [[4, 3, 60, "仕事と介護の両立…ちょっと限界かも", "r", "think"]],
         narr: "介護する人が休むことはとても大切。ショートステイ（短期間のお泊まり）も使えます。"
       },
       {
-        bg: "home",
-        people: [["caremane", 12], ["sakura", 62]],
+        bg: "living",
+        people: [["caremane", 12], ["sakura-worry", 62]],
         bubbles: [[2, 3, 56, "要介護3になったので、特養（特別養護老人ホーム）にも申し込めますよ", "l"], [62, 16, 36, "どこを選べばいいの？", "r"]],
         narr: "特養は原則「要介護3以上」。グループホームや有料老人ホームなど、ほかの住まいも選べます。"
       },
@@ -156,7 +166,7 @@ const EPISODES = [
         narr: "施設は必ず見学を。費用の総額・医療への対応・看取り・退去の条件を確認しましょう。"
       },
       {
-        bg: "home",
+        bg: "living",
         people: [["sakura", 24], ["hanako", 60]],
         bubbles: [[2, 3, 48, "いくつかの施設に申し込んでおこう", "l"], [54, 3, 43, "ここなら安心ね", "r"]],
         narr: "特養は施設に直接申し込み、必要度の高い人から入所が決まります。所得が低い人は食費・部屋代の軽減（負担限度額認定）もあります。"
@@ -176,7 +186,7 @@ const EPISODES = [
     panels: [
       {
         bg: "hospital",
-        people: [["sakura", 14]],
+        people: [["sakura-worry", 14]],
         bubbles: [[2, 3, 44, "退院したら、家でみられるかな…", "l", "think"], [48, 3, 50, "退院後のことは、病院の医療相談室にご相談くださいね", "off", "say", "病院の相談員"]],
         narr: "父・まさおさん（85歳）が転んで骨折し、入院。入院中の不安は、病院の医療相談室（医療ソーシャルワーカー）へ。"
       },
@@ -205,7 +215,9 @@ const EPISODES = [
 // ---------------------------------------------------------------- HTML
 
 function panelHtml(panel, i) {
-  const svg = `<svg viewBox="0 0 400 300" aria-hidden="true" preserveAspectRatio="xMidYMid slice">${BG[panel.bg]}</svg>`;
+  const svg = PHOTO[panel.bg]
+    ? `<img class="bgphoto" src="assets/manga/bg/${PHOTO[panel.bg].file}.jpg" alt="" width="764" height="507" style="object-position:${PHOTO[panel.bg].pos}" loading="lazy">`
+    : `<svg viewBox="0 0 400 300" aria-hidden="true" preserveAspectRatio="xMidYMid slice">${BG[panel.bg]}</svg>`;
   const actors = panel.people.map(([id, x]) => actor(id, x)).join("");
   const bubbles = panel.bubbles.map(([x, y, w, text, tail, kind, who]) =>
     `<p class="bubble${kind === "think" ? " think" : ""} tail-${tail}" style="left:${x}%;top:${y}%;width:${w}%">${who ? `<span class="who">${esc(who)}</span>` : ""}${esc(text)}</p>`).join("");
@@ -215,7 +227,7 @@ function panelHtml(panel, i) {
 </figure>`;
 }
 
-const cast = Object.keys(PEOPLE).map((id) =>
+const cast = Object.keys(PEOPLE).filter((id) => !PEOPLE[id].hidden).map((id) =>
   `<div class="cast-item"><span class="cast-face"><img src="assets/manga/${PEOPLE[id].img}.png" alt="" width="${SIZE[id].w}" height="${SIZE[id].h}"></span><span>${esc(PEOPLE[id].label)}</span></div>`).join("");
 
 const html = `<!doctype html>

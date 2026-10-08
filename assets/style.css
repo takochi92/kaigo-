@@ -434,6 +434,7 @@ details.section .grid { padding: 14px; }
 .panel { margin: 0; border: 2px solid var(--text); background: var(--surface); }
 .scene { position: relative; aspect-ratio: 1 / 1; max-width: 100%; overflow: hidden; border-bottom: 2px solid var(--text); }
 .scene svg { display: block; width: 100%; height: 100%; }
+.bgphoto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; max-width: none; }
 .actor { position: absolute; bottom: 3%; width: auto; max-width: none; z-index: 0; pointer-events: none; }
 .bubble .who { display: block; font-size: .72em; font-weight: 700; color: var(--accent-text); }
 .bubble.tail-off::after { display: none; }
