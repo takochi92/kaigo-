@@ -15,8 +15,8 @@
   .full .mark { width: 15mm; height: 15mm; background: #4f8a1f; color: #fff; display: grid; place-items: center; font-size: 10mm; }
   .full h1 { font-size: 13.5mm; line-height: 1.3; margin: 8mm 0 4mm; }
   .full .lead { font-size: 5.2mm; line-height: 1.7; margin: 0; color: #4f5a48; }
-  .full .cast { position: absolute; right: 8mm; top: 38mm; height: 88mm; display: flex; align-items: flex-end; }
-  .full .cast img { height: 100%; margin-left: -9mm; }
+  .full .cast { position: absolute; right: 12mm; top: 68mm; width: 100mm; height: auto; }
+  .full .cast img { width: 100%; height: auto; margin: 0; }
   .full .cast img.s { height: 92%; }
   .full .list { position: absolute; left: 14mm; right: 14mm; top: 132mm; display: grid; gap: 3.5mm; }
   .full .item { border: 0.6mm solid #dde3d2; border-left: 3mm solid #a8d164; padding: 3mm 6mm; }
@@ -39,8 +39,8 @@
   .card .qr { position: absolute; left: 8mm; bottom: 8mm; display: flex; align-items: center; gap: 4mm; }
   .card .qr img { width: 30mm; height: 30mm; }
   .card .qr span { font-size: 3.4mm; line-height: 1.5; font-weight: 700; }
-  .card .who { position: absolute; right: 4mm; bottom: 6mm; height: 66mm; display: flex; align-items: flex-end; }
-  .card .who img { height: 100%; margin-left: -7mm; }
+  .card .who { position: absolute; right: 5mm; bottom: 10mm; width: 48mm; height: auto; }
+  .card .who img { width: 100%; height: auto; margin: 0; }
   .card .who img.s { height: 92%; }
 </style>
 </head>
@@ -49,11 +49,11 @@
 <div class="a4 full">
   <div class="top"></div>
   <div class="head">
-    <div class="logo"><span class="mark">介</span>おやのて <span style="font-size:6mm;background:#e8792b;color:#fff;padding:1mm 3mm;margin-left:2mm">広島市版</span></div>
+    <div class="logo">おやのて <span style="font-size:6mm;background:#e8792b;color:#fff;padding:1mm 3mm;margin-left:2mm">広島市版</span></div>
     <h1>介護のこと、<br>まず何を<br>すればいい？</h1>
     <p class="lead">介護保険・施設・相談先を、<br>編集部がまんがで<br>やさしく解説するサイトです。</p>
   </div>
-  <div class="cast"><img src="caremane.png"><img src="musume.png"><img class="s" src="obaachan.png"><img class="s" src="ojiichan.png"></div>
+  <div class="cast"><img src="../../assets/handouts/family-conversation.jpg" alt="親子が穏やかに話している挿し絵"></div>
 
   <div class="list">
     <div class="item o"><b>広島市の介護事業所・病院を区ごとに一覧</b><span>中区・東区・南区・西区・安佐南区・安佐北区・安芸区・佐伯区。ケアマネ・訪問看護・デイサービス・特養・病院など、住所と電話番号がわかります（国の公開データ）。</span></div>
@@ -66,17 +66,17 @@
     <div>
       <div class="t">スマホのカメラで<br>読み取ってください</div>
       <div class="u">https://oyanote-care.com/area/34/34100.html</div>
-      <div class="s">無料・登録不要で使えます。<br>Instagram：@kaigonavi</div>
+      <div class="s">無料・登録不要で使えます。<br>お問い合わせはサイト内のフォームへ</div>
     </div>
   </div>
 </div>
 
 <div class="a4 cards">
   <!-- 同じカードを4枚 -->
-  <div class="card"><div class="logo"><span class="mark">介</span>おやのて <span style="font-size:3.6mm;background:#e8792b;color:#fff;padding:.6mm 2mm">広島市版</span></div><h2>介護のこと、<br>まず何をすればいい？</h2><p>編集部が、介護の制度と<br>相談先をやさしく解説</p><ul><li>広島市の事業所・病院の一覧</li><li>まんがでわかる介護</li><li>退院チェックリスト</li></ul><div class="who"><img src="musume.png"><img class="s" src="obaachan.png"></div><div class="qr"><img src="qr-hiroshima.svg" alt=""><span>無料・<br>登録不要</span></div></div>
-  <div class="card"><div class="logo"><span class="mark">介</span>おやのて <span style="font-size:3.6mm;background:#e8792b;color:#fff;padding:.6mm 2mm">広島市版</span></div><h2>介護のこと、<br>まず何をすればいい？</h2><p>編集部が、介護の制度と<br>相談先をやさしく解説</p><ul><li>広島市の事業所・病院の一覧</li><li>まんがでわかる介護</li><li>退院チェックリスト</li></ul><div class="who"><img src="musume.png"><img class="s" src="obaachan.png"></div><div class="qr"><img src="qr-hiroshima.svg" alt=""><span>無料・<br>登録不要</span></div></div>
-  <div class="card"><div class="logo"><span class="mark">介</span>おやのて <span style="font-size:3.6mm;background:#e8792b;color:#fff;padding:.6mm 2mm">広島市版</span></div><h2>介護のこと、<br>まず何をすればいい？</h2><p>編集部が、介護の制度と<br>相談先をやさしく解説</p><ul><li>広島市の事業所・病院の一覧</li><li>まんがでわかる介護</li><li>退院チェックリスト</li></ul><div class="who"><img src="musume.png"><img class="s" src="obaachan.png"></div><div class="qr"><img src="qr-hiroshima.svg" alt=""><span>無料・<br>登録不要</span></div></div>
-  <div class="card"><div class="logo"><span class="mark">介</span>おやのて <span style="font-size:3.6mm;background:#e8792b;color:#fff;padding:.6mm 2mm">広島市版</span></div><h2>介護のこと、<br>まず何をすればいい？</h2><p>編集部が、介護の制度と<br>相談先をやさしく解説</p><ul><li>広島市の事業所・病院の一覧</li><li>まんがでわかる介護</li><li>退院チェックリスト</li></ul><div class="who"><img src="musume.png"><img class="s" src="obaachan.png"></div><div class="qr"><img src="qr-hiroshima.svg" alt=""><span>無料・<br>登録不要</span></div></div>
+  <div class="card"><div class="logo">おやのて <span style="font-size:3.6mm;background:#e8792b;color:#fff;padding:.6mm 2mm">広島市版</span></div><h2>介護のこと、<br>まず何をすればいい？</h2><p>編集部が、介護の制度と<br>相談先をやさしく解説</p><ul><li>広島市の事業所・病院の一覧</li><li>まんがでわかる介護</li><li>退院チェックリスト</li></ul><div class="who"><img src="../../assets/handouts/family-conversation.jpg" alt="親子が話している挿し絵"></div><div class="qr"><img src="qr-hiroshima.svg" alt=""><span>無料・<br>登録不要</span></div></div>
+  <div class="card"><div class="logo">おやのて <span style="font-size:3.6mm;background:#e8792b;color:#fff;padding:.6mm 2mm">広島市版</span></div><h2>介護のこと、<br>まず何をすればいい？</h2><p>編集部が、介護の制度と<br>相談先をやさしく解説</p><ul><li>広島市の事業所・病院の一覧</li><li>まんがでわかる介護</li><li>退院チェックリスト</li></ul><div class="who"><img src="../../assets/handouts/family-conversation.jpg" alt="親子が話している挿し絵"></div><div class="qr"><img src="qr-hiroshima.svg" alt=""><span>無料・<br>登録不要</span></div></div>
+  <div class="card"><div class="logo">おやのて <span style="font-size:3.6mm;background:#e8792b;color:#fff;padding:.6mm 2mm">広島市版</span></div><h2>介護のこと、<br>まず何をすればいい？</h2><p>編集部が、介護の制度と<br>相談先をやさしく解説</p><ul><li>広島市の事業所・病院の一覧</li><li>まんがでわかる介護</li><li>退院チェックリスト</li></ul><div class="who"><img src="../../assets/handouts/family-conversation.jpg" alt="親子が話している挿し絵"></div><div class="qr"><img src="qr-hiroshima.svg" alt=""><span>無料・<br>登録不要</span></div></div>
+  <div class="card"><div class="logo">おやのて <span style="font-size:3.6mm;background:#e8792b;color:#fff;padding:.6mm 2mm">広島市版</span></div><h2>介護のこと、<br>まず何をすればいい？</h2><p>編集部が、介護の制度と<br>相談先をやさしく解説</p><ul><li>広島市の事業所・病院の一覧</li><li>まんがでわかる介護</li><li>退院チェックリスト</li></ul><div class="who"><img src="../../assets/handouts/family-conversation.jpg" alt="親子が話している挿し絵"></div><div class="qr"><img src="qr-hiroshima.svg" alt=""><span>無料・<br>登録不要</span></div></div>
 </div>
 
 </body>
