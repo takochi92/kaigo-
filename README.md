@@ -44,25 +44,9 @@ npm run serve                                   # http://localhost:8000 で確�
 
 Google検索に出すには、[Google Search Console](https://search.google.com/search-console) にサイトを登録し、`sitemap.xml` を送信してください。独自ドメインを使う場合は Pages の Custom domain を設定します（sitemap のURLは自動で切り替わります）。
 
-## Claude 作業ログ（`claude/`）
+## Claude の作業通知
 
-Claude がつくったファイル・データを毎日まとめる自分用のダッシュボードです。サイト（GitHub Pages）には載せません。手元で `npm run claude` を実行し、http://localhost:8001 で見られます。
-
-| ファイル | 内容 |
-|---|---|
-| `claude/index.html` | ダッシュボード：今日の作業数・作ったファイル・連続日数・活動ヒートマップ・タイムライン |
-| `claude/tasks.json` | Claude に頼んでいるタスクのまとめ（手で編集して増やせます） |
-| `claude/widget.html` | ウィジェット風の小さな表示 |
-| `claude/scriptable-widget.js` | iPhone の「Scriptable」アプリでホーム画面ウィジェットにするスクリプト（非公開リポジトリならトークンを登録） |
-| `scripts/claude-log.mjs` | git の全ブランチの履歴から Claude のコミットを集めて `log.json`・`feed.xml` を生成 |
-| `.github/workflows/claude-daily.yml` | push のたびにログを `claude-log` ブランチへ更新、毎朝 7:47 に前日の日報を Issue で通知 |
-
-日報 Issue はリポジトリの持ち主に割り当てられるので、GitHub アプリの通知をオンにしておくとスマホに届きます。毎朝の実行（schedule）はデフォルトブランチに入ってから動きます。
-
-```bash
-npm run claude                                  # ログを生成して http://localhost:8001 で表示
-node scripts/claude-log.mjs --report yesterday  # 前日の日報（Markdown）を表示
-```
+Claude がコミットを push すると、`.github/workflows/claude-notify.yml` がスマホの ntfy アプリに通知します（Secrets の `NTFY_TOPIC` を設定したときだけ）。タスク・作成物・ツイートの一覧は非公開リポジトリ `claude-hub` にまとめています。
 
 ## 注意
 
