@@ -46,21 +46,21 @@ Google検索に出すには、[Google Search Console](https://search.google.com/
 
 ## Claude 作業ログ（`claude/`）
 
-Claude がつくったファイル・データを毎日まとめるダッシュボードです（`https://takochi92.github.io/kaigo-/claude/`。検索エンジンには出しません）。
+Claude がつくったファイル・データを毎日まとめる自分用のダッシュボードです。サイト（GitHub Pages）には載せません。手元で `npm run claude` を実行し、http://localhost:8001 で見られます。
 
 | ファイル | 内容 |
 |---|---|
 | `claude/index.html` | ダッシュボード：今日の作業数・作ったファイル・連続日数・活動ヒートマップ・タイムライン |
 | `claude/tasks.json` | Claude に頼んでいるタスクのまとめ（手で編集して増やせます） |
-| `claude/widget.html` | スマホ用の小さなウィジェット表示（ホーム画面に追加できます） |
-| `claude/scriptable-widget.js` | iPhone の「Scriptable」アプリで本物のホーム画面ウィジェットにするスクリプト |
+| `claude/widget.html` | ウィジェット風の小さな表示 |
+| `claude/scriptable-widget.js` | iPhone の「Scriptable」アプリでホーム画面ウィジェットにするスクリプト（非公開リポジトリならトークンを登録） |
 | `scripts/claude-log.mjs` | git の全ブランチの履歴から Claude のコミットを集めて `log.json`・`feed.xml` を生成 |
 | `.github/workflows/claude-daily.yml` | push のたびにログを `claude-log` ブランチへ更新、毎朝 7:47 に前日の日報を Issue で通知 |
 
 日報 Issue はリポジトリの持ち主に割り当てられるので、GitHub アプリの通知をオンにしておくとスマホに届きます。毎朝の実行（schedule）はデフォルトブランチに入ってから動きます。
 
 ```bash
-node scripts/claude-log.mjs --out dist/claude   # ログを生成
+npm run claude                                  # ログを生成して http://localhost:8001 で表示
 node scripts/claude-log.mjs --report yesterday  # 前日の日報（Markdown）を表示
 ```
 

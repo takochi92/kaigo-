@@ -235,7 +235,6 @@
   }
 
   setupNotifyButton();
-  $("widget-url").textContent = location.href.replace(/[#?].*$/, "").replace(/(index\.html)?$/, "widget.html");
   fetch("tasks.json", { cache: "no-store" }).then(function (r) { return r.json(); }).then(renderTasks).catch(function () { renderTasks(null); });
   refresh(true);
   setInterval(function () { if (!document.hidden) refresh(false); }, 10 * 60 * 1000);
