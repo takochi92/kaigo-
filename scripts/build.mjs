@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// かいごナビ ビルドスクリプト（依存パッケージなし・Node.js 20 以上）
+// おやのて ビルドスクリプト（依存パッケージなし・Node.js 20 以上）
 //
 // 1. 厚生労働省「介護サービス情報公表システム」オープンデータのCSV（介護事業所）と
 //    「医療情報ネット」オープンデータのZIP（病院・診療所・歯科診療所）を取得
@@ -25,7 +25,7 @@ const DIST = path.join(ROOT, "dist");
 const OPEN_DATA_PAGE = "https://www.mhlw.go.jp/stf/kaigo-kouhyou_opendata.html";
 const MED_DATA_PAGE = "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/kenkou_iryou/iryou/newpage_43373.html";
 const SITE_CONFIG = JSON.parse(fs.readFileSync(path.join(ROOT, "site.config.json"), "utf8"));
-const SITE_URL = (process.env.SITE_URL || "https://takochi92.github.io/kaigo-").replace(/\/$/, "");
+const SITE_URL = (process.env.SITE_URL || "https://oyanote-care.com").replace(/\/$/, "");
 
 const args = process.argv.slice(2);
 const argValue = (name) => {
@@ -492,17 +492,17 @@ function addShareTags() {
     if (!html.includes('rel="canonical"')) html = html.replace("</head>", `<link rel="canonical" href="${esc(url)}">\n</head>`);
     const up = "../".repeat(rel.split("/").length - 1);
     const root = rel === "404.html" ? `${SITE_URL}/` : up;
-    html = html.replace('<header id="site-header"></header>', `<header id="site-header" class="site-header"><div class="wrap"><a class="logo" href="${root}index.html">かいごナビ</a><nav aria-label="基本メニュー"><a href="${root}tsugi.html">次にやること</a>　<a href="${root}search.html">事業所検索</a>　<a href="${root}shisetsu.html">相談窓口</a>　<a href="${root}about.html">運営者情報</a></nav></div></header>`);
+    html = html.replace('<header id="site-header"></header>', `<header id="site-header" class="site-header"><div class="wrap"><a class="logo" href="${root}index.html">おやのて</a><nav aria-label="基本メニュー"><a href="${root}tsugi.html">次にやること</a>　<a href="${root}search.html">事業所検索</a>　<a href="${root}shisetsu.html">相談窓口</a>　<a href="${root}about.html">運営者情報</a></nav></div></header>`);
     if (ga) html = html.replace("</head>", ga + "\n</head>");
     if (html.includes('property="og:image"')) { fs.writeFileSync(file, html); continue; }
-    const title = (html.match(/<title>([^<]*)<\/title>/) || [])[1] || "かいごナビ";
+    const title = (html.match(/<title>([^<]*)<\/title>/) || [])[1] || "おやのて";
     const desc = (html.match(/<meta name="description" content="([^"]*)"/) || [])[1] || "";
     const tags = [
       html.includes('property="og:title"') ? "" : `<meta property="og:title" content="${title}">`,
       html.includes('property="og:description"') || !desc ? "" : `<meta property="og:description" content="${desc}">`,
       html.includes('property="og:url"') ? "" : `<meta property="og:url" content="${url}">`,
       html.includes('property="og:type"') ? "" : `<meta property="og:type" content="website">`,
-      `<meta property="og:site_name" content="かいごナビ">`,
+      `<meta property="og:site_name" content="おやのて">`,
       `<meta property="og:image" content="${image}">`,
       `<meta property="og:image:width" content="1200">`,
       `<meta property="og:image:height" content="630">`,
@@ -617,7 +617,7 @@ async function main() {
       const rel = `area/${pc}/${c.slug}.html`;
       const canonical = `${SITE_URL}/${rel}`;
       write(rel, page({
-        title: `${PREFS[pi]}${c.name}の介護事業所・病院一覧（${c.offices.length}件）｜かいごナビ`,
+        title: `${PREFS[pi]}${c.name}の介護事業所・病院一覧（${c.offices.length}件）｜おやのて`,
         description: `${PREFS[pi]}${c.name}の介護事業所・病院・診療所${c.offices.length}件の住所・電話番号。ケアマネ事業所、訪問介護、訪問看護、デイサービス、特養、グループホーム、病院、クリニックなど。`,
         canonical,
         depth: 2,
@@ -625,7 +625,7 @@ async function main() {
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "かいごナビ", item: `${SITE_URL}/` },
+            { "@type": "ListItem", position: 1, name: "おやのて", item: `${SITE_URL}/` },
             { "@type": "ListItem", position: 2, name: PREFS[pi], item: `${SITE_URL}/area/${pc}/` },
             { "@type": "ListItem", position: 3, name: c.name, item: canonical }
           ]
@@ -663,7 +663,7 @@ ${sections}
       const pcanon = `${SITE_URL}/${prel}`;
       parentPages.push({ slug, name: cityName, total });
       write(prel, page({
-        title: `${PREFS[pi]}${cityName}の介護事業所・病院一覧（区ごと・${total}件）｜かいごナビ`,
+        title: `${PREFS[pi]}${cityName}の介護事業所・病院一覧（区ごと・${total}件）｜おやのて`,
         description: `${PREFS[pi]}${cityName}の介護事業所・病院・診療所${total}件を区ごとに掲載。ケアマネ事業所、訪問介護、訪問看護、デイサービス、特養、グループホーム、病院など。`,
         canonical: pcanon,
         depth: 2,
@@ -684,7 +684,7 @@ ${sections}
     const rel = `area/${pc}/index.html`;
     const canonical = `${SITE_URL}/area/${pc}/`;
     write(rel, page({
-      title: `${PREFS[pi]}の介護事業所・病院一覧（市区町村別）｜かいごナビ`,
+      title: `${PREFS[pi]}の介護事業所・病院一覧（市区町村別）｜おやのて`,
       description: `${PREFS[pi]}の介護事業所・病院・診療所${offices.length}件を市区町村別に掲載。住所・電話番号を確認できます。`,
       canonical,
       depth: 2,
@@ -700,7 +700,7 @@ ${parentPages.length ? `<h2>政令指定都市（区ごと）</h2><div class="ch
 
   // 全国の都道府県一覧
   write("area/index.html", page({
-    title: "全国の介護事業所・病院一覧（都道府県別）｜かいごナビ",
+    title: "全国の介護事業所・病院一覧（都道府県別）｜おやのて",
     description: "全国の介護事業所・病院・診療所を都道府県・市区町村別に掲載。",
     canonical: `${SITE_URL}/area/`,
     depth: 1,

@@ -42,4 +42,4 @@
 
 YouTubeの説明欄に入れる文（共通）：
 介護保険・施設・相談先を、編集部がまんがでやさしく解説しています。
-全国の介護事業所・病院の検索はこちら → https://takochi92.github.io/kaigo-/
+全国の介護事業所・病院の検索はこちら → https://oyanote-care.com/

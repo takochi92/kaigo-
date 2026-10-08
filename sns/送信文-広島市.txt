@@ -4,25 +4,25 @@
 
 〇〇地域包括支援センター（または 広島市 〇〇課）ご担当者様
 
-突然のご連絡失礼いたします。介護のご家族向け情報サイト「かいごナビ」編集部です。
+突然のご連絡失礼いたします。介護のご家族向け情報サイト「おやのて」編集部です。
 
 「どこに相談すればいいか分からない」というご家族向けに、相談から要介護認定、サービス利用、退院の準備までをまんがで説明したページを作りました。広島市の介護事業所・病院を区ごとにまとめたページもあります（国の公開データをもとに作成）。
 
-・まんがでわかる介護：https://takochi92.github.io/kaigo-/manga.html
-・広島市の事業所・病院一覧（区ごと）：https://takochi92.github.io/kaigo-/area/34/34100.html
+・まんがでわかる介護：https://oyanote-care.com/manga.html
+・広島市の事業所・病院一覧（区ごと）：https://oyanote-care.com/area/34/34100.html
 
 無料・登録不要・広告なしで、印刷用のチラシ（広島市版・PDF）もご自由にお使いいただけます。必要でしたらお送りします。
 ご家族への説明の補助や、窓口・教室での配布などにお役立ていただければ幸いです。内容の誤りやご意見もお聞かせいただけると助かります。
 
-かいごナビ編集部
+おやのて編集部
 お問い合わせ：https://docs.google.com/forms/d/e/1FAIpQLSdJhFLMeFev3Il-ncBg1lLS5uhkh1U0EDWpnrQMb4zLgxcZWg/viewform
 
 区ごとのページ（区の包括に送るときは、その区のページに差し替えると響きます）
-・中区　　https://takochi92.github.io/kaigo-/area/34/34101.html
-・東区　　https://takochi92.github.io/kaigo-/area/34/34102.html
-・南区　　https://takochi92.github.io/kaigo-/area/34/34103.html
-・西区　　https://takochi92.github.io/kaigo-/area/34/34104.html
-・安佐南区 https://takochi92.github.io/kaigo-/area/34/34105.html
-・安佐北区 https://takochi92.github.io/kaigo-/area/34/34106.html
-・安芸区　https://takochi92.github.io/kaigo-/area/34/34107.html
-・佐伯区　https://takochi92.github.io/kaigo-/area/34/34108.html
+・中区　　https://oyanote-care.com/area/34/34101.html
+・東区　　https://oyanote-care.com/area/34/34102.html
+・南区　　https://oyanote-care.com/area/34/34103.html
+・西区　　https://oyanote-care.com/area/34/34104.html
+・安佐南区 https://oyanote-care.com/area/34/34105.html
+・安佐北区 https://oyanote-care.com/area/34/34106.html
+・安芸区　https://oyanote-care.com/area/34/34107.html
+・佐伯区　https://oyanote-care.com/area/34/34108.html

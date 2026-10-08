@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 2
     env:
       NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
-      PROJECT: かいごナビ
+      PROJECT: おやのて
     steps:
       - name: ntfy に通知
         if: env.NTFY_TOPIC != ''

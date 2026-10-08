@@ -18,7 +18,7 @@ const CSS = `
   .bar .n { background: #fff; color: #4f8a1f; padding: 0 6px; }
   .slide .scene { order: 2; width: 360px; height: 360px; aspect-ratio: auto; border-bottom: 2px solid #2b3027; flex: none; }
   .slide .scene .koma { display: none; }
-  .slide::after { content: "かいごナビ ＠kaigonavi"; position: absolute; left: 0; right: 0; bottom: 0; height: 34px; display: flex; align-items: center; justify-content: center; background: #4f8a1f; color: #fff; font-size: 12.5px; font-weight: 700; }
+  .slide::after { content: "おやのて ＠kaigonavi"; position: absolute; left: 0; right: 0; bottom: 0; height: 34px; display: flex; align-items: center; justify-content: center; background: #4f8a1f; color: #fff; font-size: 12.5px; font-weight: 700; }
   .slide .cap { order: 1; flex: none; min-height: 118px; box-sizing: border-box; background: #eef6e1; padding: 12px 16px; font-size: 15px; line-height: 1.7; display: flex; align-items: center; }
   .cover { background: #eef6e1; padding: 70px 22px 0; box-sizing: border-box; }
   .cover .ep { display: inline-block; background: #e8792b; color: #fff; font-weight: 700; font-size: 15px; padding: 3px 10px; }
@@ -77,7 +77,7 @@ const CSS = `
           : ep.id === "ep2"
             ? '<img src="assets/manga/caremane.png"><img src="assets/manga/musume.png"><img class="s" src="assets/manga/obaachan.png">'
             : '<img src="assets/manga/musume-worry.png"><img class="s" src="assets/manga/obaachan.png">';
-      ig.innerHTML = `<div class="slide cover"><span class="ep">まんがでわかる介護 第${no}話</span><h1>${ep.title.replace(/^第[0-9]+話[\s　]*/, "")}</h1><p class="sub">${ep.sub}</p><div class="who">${who}</div><div class="brand">かいごナビ<br>@kaigonavi</div></div>`;
+      ig.innerHTML = `<div class="slide cover"><span class="ep">まんがでわかる介護 第${no}話</span><h1>${ep.title.replace(/^第[0-9]+話[\s　]*/, "")}</h1><p class="sub">${ep.sub}</p><div class="who">${who}</div><div class="brand">おやのて<br>@kaigonavi</div></div>`;
     }, { ep, no });
     await shot(`ep${no}-01`);
 
@@ -101,7 +101,7 @@ const CSS = `
 
     // まとめ
     await p.evaluate(({ ep, no, total }) => {
-      document.getElementById("ig").innerHTML = `<div class="slide end"><div class="bar" style="margin:-24px -22px 18px"><span>第${no}話のポイント</span><span class="n">${total}/${total}</span></div><h2>この話のポイント</h2><ul>${ep.points.map((t) => `<li>${t}</li>`).join("")}</ul><div class="go">相談先・全国の介護事業所と病院の検索、ほかのお話は<br><b>プロフィールのリンク（かいごナビ）</b>から見られます。</div><div class="acc">かいごナビ @kaigonavi ／ 医療従事者がやさしく解説</div></div>`;
+      document.getElementById("ig").innerHTML = `<div class="slide end"><div class="bar" style="margin:-24px -22px 18px"><span>第${no}話のポイント</span><span class="n">${total}/${total}</span></div><h2>この話のポイント</h2><ul>${ep.points.map((t) => `<li>${t}</li>`).join("")}</ul><div class="go">相談先・全国の介護事業所と病院の検索、ほかのお話は<br><b>プロフィールのリンク（おやのて）</b>から見られます。</div><div class="acc">おやのて @kaigonavi ／ 編集部がやさしく解説</div></div>`;
     }, { ep, no, total });
     await shot(`ep${no}-${String(total).padStart(2, "0")}`);
   }

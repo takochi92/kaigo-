@@ -55,7 +55,7 @@ for (const a of ARTICLES) {
   const body = `<main class="wrap" style="max-width:48em">
   <p class="small muted"><a href="${up}index.html">トップ</a> › <a href="index.html">読みもの</a> › ${esc(catName[a.cat])}</p>
   <h1>${esc(a.title)}</h1>
-  <p class="small muted">かいごナビ編集部／${a.date.replace(/^(\d+)-0?(\d+)-0?(\d+)$/, "$1年$2月$3日")}</p>
+  <p class="small muted">おやのて編集部／${a.date.replace(/^(\d+)-0?(\d+)-0?(\d+)$/, "$1年$2月$3日")}</p>
   <p class="lead">${esc(a.lead)}</p>
   <div class="tip"><strong>この記事のポイント</strong><ul style="margin:6px 0 0">${a.summary.map((s) => `<li>${esc(s)}</li>`).join("")}</ul></div>
   ${toc ? `<nav class="toc" aria-label="この記事の目次">${toc}</nav>` : ""}
@@ -66,11 +66,11 @@ for (const a of ARTICLES) {
   <p class="note">この記事は一般的な解説です。制度や手続きは自治体や状況によって異なることがあります。具体的なことは、地域包括支援センター・ケアマネジャー・主治医などにご相談ください。わからない言葉は<a href="${up}yougo.html">用語集</a>で調べられます。</p>
 </main>`;
   fs.writeFileSync(path.join(ROOT, "yomimono", `${a.slug}.html`), page({
-    title: `${a.title}｜かいごナビ`,
+    title: `${a.title}｜おやのて`,
     description: `${a.lead} ${a.summary.join("。")}。`.slice(0, 160),
     up,
     body,
-    jsonLd: { "@context": "https://schema.org", "@type": "Article", headline: a.title, author: { "@type": "Organization", name: "かいごナビ編集部" }, publisher: { "@type": "Organization", name: "かいごナビ" }, datePublished: a.date, dateModified: a.date, inLanguage: "ja" }
+    jsonLd: { "@context": "https://schema.org", "@type": "Article", headline: a.title, author: { "@type": "Organization", name: "おやのて編集部" }, publisher: { "@type": "Organization", name: "おやのて" }, datePublished: a.date, dateModified: a.date, inLanguage: "ja" }
   }));
 }
 
@@ -85,7 +85,7 @@ for (const a of ARTICLES) {
   }).join("\n");
   const toc = CATEGORIES.filter(([id]) => all.some((a) => a.cat === id)).map(([id, name]) => `<a href="#${id}">${esc(name)}</a>`).join("");
   fs.writeFileSync(path.join(ROOT, "yomimono", "index.html"), page({
-    title: "読みもの｜介護の制度・相談先をやさしく解説｜かいごナビ",
+    title: "読みもの｜介護の制度・相談先をやさしく解説｜おやのて",
     description: "地域包括支援センター、要介護1のサービスと費用、認知症、特養の申し込み、介護休業、訪問看護、病院の種類、在宅での看取りなど、介護でよくある悩みに編集部が制度や相談先を案内します。",
     up,
     body: `<main class="wrap">
@@ -130,7 +130,7 @@ for (const a of ARTICLES) {
 })();
 </script>`;
   fs.writeFileSync(path.join(ROOT, "yougo.html"), page({
-    title: "介護・医療の用語集｜かいごナビ",
+    title: "介護・医療の用語集｜おやのて",
     description: "ケアマネジャー、ケアプラン、ADL、要介護認定、ショートステイ、訪問看護、胃ろう、ACP（人生会議）など、介護・医療でよく出てくる言葉をやさしく説明します。",
     up,
     body,

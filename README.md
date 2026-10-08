@@ -1,4 +1,4 @@
-# かいごナビ
+# おやのて
 
 介護が必要になったときに「何をすればいいか」「どこに連絡すればいいか」がわかる情報サイトです。
 
@@ -42,7 +42,7 @@ npm run serve                                   # http://localhost:8000 で確�
 
 1. GitHub のリポジトリ → Settings → Pages → Source を「GitHub Actions」にする
 2. Actions タブで「Build and deploy」を実行（push でも自動実行）
-3. `https://takochi92.github.io/kaigo-/` で公開されます
+3. `https://oyanote-care.com/` で公開されます
 
 Google検索に出すには、[Google Search Console](https://search.google.com/search-console) にサイトを登録し、`sitemap.xml` を送信してください。独自ドメインを使う場合は Pages の Custom domain を設定します（sitemap のURLは自動で切り替わります）。
 

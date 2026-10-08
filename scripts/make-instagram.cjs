@@ -73,7 +73,7 @@ const CSS = `
           : ep.id === "ep2"
             ? '<img src="assets/manga/caremane.png"><img src="assets/manga/musume.png"><img class="s" src="assets/manga/obaachan.png">'
             : '<img src="assets/manga/musume-worry.png"><img class="s" src="assets/manga/obaachan.png">';
-      ig.innerHTML = `<div class="slide cover"><span class="ep">まんがでわかる介護 第${no}話</span><h1>${ep.title.replace(/^第[0-9]+話[\s　]*/, "")}</h1><p class="sub">${ep.sub}</p><div class="who">${who}</div><span class="swipe">スワイプして読む →</span><div class="brand">かいごナビ<br>@kaigonavi</div></div>`;
+      ig.innerHTML = `<div class="slide cover"><span class="ep">まんがでわかる介護 第${no}話</span><h1>${ep.title.replace(/^第[0-9]+話[\s　]*/, "")}</h1><p class="sub">${ep.sub}</p><div class="who">${who}</div><span class="swipe">スワイプして読む →</span><div class="brand">おやのて<br>@kaigonavi</div></div>`;
     }, { ep, no });
     await shot(`ep${no}-01`);
 
@@ -97,16 +97,16 @@ const CSS = `
 
     // まとめ
     await p.evaluate(({ ep, no, total }) => {
-      document.getElementById("ig").innerHTML = `<div class="slide end"><div class="bar" style="margin:-24px -22px 18px"><span>第${no}話のポイント</span><span class="n">${total}/${total}</span></div><h2>この話のポイント</h2><ul>${ep.points.map((t) => `<li>${t}</li>`).join("")}</ul><div class="go">相談先・全国の介護事業所と病院の検索、ほかのお話は<br><b>プロフィールのリンク（かいごナビ）</b>から見られます。</div><div class="acc">かいごナビ @kaigonavi ／ 医療従事者がやさしく解説</div></div>`;
+      document.getElementById("ig").innerHTML = `<div class="slide end"><div class="bar" style="margin:-24px -22px 18px"><span>第${no}話のポイント</span><span class="n">${total}/${total}</span></div><h2>この話のポイント</h2><ul>${ep.points.map((t) => `<li>${t}</li>`).join("")}</ul><div class="go">相談先・全国の介護事業所と病院の検索、ほかのお話は<br><b>プロフィールのリンク（おやのて）</b>から見られます。</div><div class="acc">おやのて @kaigonavi ／ 編集部がやさしく解説</div></div>`;
     }, { ep, no, total });
     await shot(`ep${no}-${String(total).padStart(2, "0")}`);
   }
 
   // アカウント紹介（3枚）
   const intro = [
-    `<div class="slide cover"><span class="ep">はじめまして</span><h1>介護のこと、<br>まず何をすればいい？</h1><p class="sub">医療従事者が、介護保険・施設・相談先を<br>まんがでやさしく解説するアカウントです。</p><div class="who" style="height:215px;right:6px"><img src="assets/manga/caremane.png"><img src="assets/manga/houkatsu.png"><img src="assets/manga/musume.png"><img class="s" src="assets/manga/obaachan.png"><img class="s" src="assets/manga/ojiichan.png"></div><span class="swipe" style="bottom:auto;top:208px">スワイプ →</span><div class="brand" style="bottom:auto;top:236px">かいごナビ<br>@kaigonavi</div></div>`,
-    `<div class="slide end"><div class="bar" style="margin:-24px -22px 18px"><span>かいごナビについて</span><span class="n">2/3</span></div><h2>こんな方へ</h2><ul><li>親の様子が心配だけど、どこに相談すればいいかわからない</li><li>介護保険の申請って、何をすればいいの？</li><li>退院が決まったけど、家でみられるか不安</li><li>施設の種類が多すぎて、違いがわからない</li></ul><div class="go">介護の制度は年々複雑になっています。<br><b>迷わず、ひとりで抱え込まずに</b>支援につながれるよう、わかりやすく発信します。</div></div>`,
-    `<div class="slide end"><div class="bar" style="margin:-24px -22px 18px"><span>かいごナビでできること</span><span class="n">3/3</span></div><h2>サイトでできること</h2><ul><li><b>まんがでわかる介護</b>：申請から施設・退院まで</li><li><b>全国の介護事業所・病院検索</b>：国の公開データから、住所・電話番号を確認</li><li><b>相談窓口の探し方</b>：地域包括支援センターなど</li><li><b>読みもの</b>：退院の準備チェックリストなど</li></ul><div class="go">ぜひ<b>プロフィールのリンク</b>から見てみてください。<br>フォローすると新しいお話が届きます。</div><div class="acc">かいごナビ @kaigonavi</div></div>`
+    `<div class="slide cover"><span class="ep">はじめまして</span><h1>介護のこと、<br>まず何をすればいい？</h1><p class="sub">編集部が、介護保険・施設・相談先を<br>まんがでやさしく解説するアカウントです。</p><div class="who" style="height:215px;right:6px"><img src="assets/manga/caremane.png"><img src="assets/manga/houkatsu.png"><img src="assets/manga/musume.png"><img class="s" src="assets/manga/obaachan.png"><img class="s" src="assets/manga/ojiichan.png"></div><span class="swipe" style="bottom:auto;top:208px">スワイプ →</span><div class="brand" style="bottom:auto;top:236px">おやのて<br>@kaigonavi</div></div>`,
+    `<div class="slide end"><div class="bar" style="margin:-24px -22px 18px"><span>おやのてについて</span><span class="n">2/3</span></div><h2>こんな方へ</h2><ul><li>親の様子が心配だけど、どこに相談すればいいかわからない</li><li>介護保険の申請って、何をすればいいの？</li><li>退院が決まったけど、家でみられるか不安</li><li>施設の種類が多すぎて、違いがわからない</li></ul><div class="go">介護の制度は年々複雑になっています。<br><b>迷わず、ひとりで抱え込まずに</b>支援につながれるよう、わかりやすく発信します。</div></div>`,
+    `<div class="slide end"><div class="bar" style="margin:-24px -22px 18px"><span>おやのてでできること</span><span class="n">3/3</span></div><h2>サイトでできること</h2><ul><li><b>まんがでわかる介護</b>：申請から施設・退院まで</li><li><b>全国の介護事業所・病院検索</b>：国の公開データから、住所・電話番号を確認</li><li><b>相談窓口の探し方</b>：地域包括支援センターなど</li><li><b>読みもの</b>：退院の準備チェックリストなど</li></ul><div class="go">ぜひ<b>プロフィールのリンク</b>から見てみてください。<br>フォローすると新しいお話が届きます。</div><div class="acc">おやのて @kaigonavi</div></div>`
   ];
   for (const [i, h] of intro.entries()) {
     await p.evaluate((h) => { document.getElementById("ig").innerHTML = h; }, h);

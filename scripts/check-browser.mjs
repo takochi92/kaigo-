@@ -7,7 +7,7 @@ import { chromium } from 'playwright';
 const root=path.resolve('dist');
 const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.json':'application/json','.pdf':'application/pdf'};
 const server=http.createServer((req,res)=>{
-  let rel=decodeURIComponent(new URL(req.url,'http://localhost').pathname).replace(/^\/kaigo-\//,'');
+  let rel=decodeURIComponent(new URL(req.url,'http://localhost').pathname).replace(/^\//,'');
   let file=path.resolve(root,rel || 'index.html');
   if(!file.startsWith(root+path.sep)){res.writeHead(404);res.end();return;}
   if(fs.existsSync(file) && fs.statSync(file).isDirectory())file=path.join(file,'index.html');
@@ -22,7 +22,7 @@ try {
  await page.route('**/*',route=>new URL(route.request().url()).hostname==='127.0.0.1'?route.continue():route.abort());
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const pages=fs.readdirSync(root).filter(f=>f.endsWith('.html')&&f!=='404.html').concat(fs.readdirSync(path.join(root,'yomimono')).filter(f=>f.endsWith('.html')).map(f=>'yomimono/'+f));
- const base=`http://127.0.0.1:${server.address().port}/kaigo-/`;
+ const base=`http://127.0.0.1:${server.address().port}/`;
  for(const width of [320,390,1280]){
   await page.setViewportSize({width,height:844});
   for(const file of pages){

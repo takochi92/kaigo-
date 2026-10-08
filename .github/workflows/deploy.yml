@@ -32,8 +32,8 @@ jobs:
       - name: Build (download open data)
         run: node scripts/build.mjs
         env:
-          # 独自ドメインにしたらリポジトリの Variables に SITE_URL を設定
-          SITE_URL: ${{ vars.SITE_URL || 'https://takochi92.github.io/kaigo-' }}
+          # 独自ドメインを正規URLとして固定
+          SITE_URL: https://oyanote-care.com
       - name: Validate built pages
         run: npm run check
       - name: Install browser checker
