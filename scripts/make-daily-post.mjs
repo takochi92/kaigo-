@@ -178,8 +178,7 @@ const xText = xFor(post);
 fs.writeFileSync(path.join(dir, "x.txt"), xText + "\n");
 // Atelier（投稿の下書き置き場）に送る形。同じ日・媒体・slot は上書きされる
 const atelier = { posts: [
-  { project: "care", channel: "Instagram", date: DATE, slot: "morning", text: caption },
-  { project: "care", channel: "X", date: DATE, slot: "morning", text: xText }
+  { project: "care", channel: "Instagram", date: DATE, slot: "morning", text: caption }
 ] };
 fs.writeFileSync(path.join(dir, "atelier.json"), JSON.stringify(atelier, null, 2) + "\n");
 const meta = { date: DATE, postAt: CONF.postAt, kind: post.kind, key: post.key, title: post.title, images: files, caption, x: xText };

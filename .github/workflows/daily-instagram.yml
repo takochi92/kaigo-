@@ -1,6 +1,7 @@
 # 毎朝、その日の Instagram 投稿（画像＋投稿文）を読みもの・用語集から自動で作る
 #  - 作ったものは sns-auto ブランチに置く（最近 keepDays 日分だけ。サイトの公開には影響しない）
 #  - Secrets の NTFY_TOPIC があれば、投稿時間（sns/daily.config.json の postAt）にスマホへ通知する
+#  - Secrets の ATELIER_SITE_URL・ATELIER_SERVICE_TOKEN・ATELIER_INGEST_TOKEN があれば、Instagram 原稿を Atelier の下書きに送る
 #  - 設定・順番は sns/daily.config.json と scripts/make-daily-post.mjs
 name: Daily Instagram post
 
@@ -62,6 +63,37 @@ jobs:
           git add -A
           git commit -q -m "Daily Instagram posts $(date -u +%F)"
           git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" HEAD:sns-auto
+      # 持ち主の下書き置き場 Atelier（自動作成された投稿）に、おやのての Instagram 原稿を入れる
+      - name: Send draft to Atelier
+        env:
+          ATELIER_SITE_URL: ${{ secrets.ATELIER_SITE_URL }}
+          ATELIER_SERVICE_TOKEN: ${{ secrets.ATELIER_SERVICE_TOKEN }}
+          ATELIER_INGEST_TOKEN: ${{ secrets.ATELIER_INGEST_TOKEN }}
+        if: env.ATELIER_SITE_URL != '' && env.ATELIER_INGEST_TOKEN != ''
+        run: |
+          node - <<'JS'
+          const fs = require("fs");
+          const idx = JSON.parse(fs.readFileSync("out/index.json", "utf8"));
+          const p = idx.posts.find((x) => x.date === idx.updated);
+          const { posts } = JSON.parse(fs.readFileSync(`out/${p.date}/atelier.json`, "utf8"));
+          const site = process.env.ATELIER_SITE_URL.trim().replace(/\/+$/, "");
+          (async () => {
+            for (const post of posts) {
+              const r = await fetch(site + "/api/posts", {
+                method: "POST",
+                headers: {
+                  "content-type": "application/json",
+                  "OAI-Sites-Authorization": "Bearer " + (process.env.ATELIER_SERVICE_TOKEN || "").trim(),
+                  "x-atelier-token": process.env.ATELIER_INGEST_TOKEN.trim()
+                },
+                body: JSON.stringify(post)
+              });
+              const body = await r.json().catch(() => ({}));
+              if (!r.ok || !body.ok) { console.error(`Atelier ${post.channel}: failed (${r.status}) ${body.error || ""}`); process.exitCode = 1; continue; }
+              console.log(`${body.post.project} / ${body.post.channel} / ${body.post.date}: saved`);
+            }
+          })();
+          JS
       - name: Notify at posting time
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
