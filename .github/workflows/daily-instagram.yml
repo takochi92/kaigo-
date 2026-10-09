@@ -76,8 +76,10 @@ jobs:
           const caption = fs.readFileSync("out/" + p.caption, "utf8");
           // 投稿時間（日本時間）に届くように予約。過ぎていたらすぐ送る
           const at = Date.parse(`${p.date}T${p.postAt}:00+09:00`);
+          const t = process.env.NTFY_TOPIC;
+          console.log("topic check: length", t.length, "url", /:\/\//.test(t), "space", /\s/.test(t), "slash", t.includes("/"));
           const body = {
-            topic: process.env.NTFY_TOPIC,
+            topic: process.env.NTFY_TOPIC.trim().replace(/^https?:\/\/ntfy\.sh\//, "").replace(/\/+$/, ""),
             title: "📸 インスタ投稿の時間です：" + p.title,
             message: `画像${p.images.length}枚・投稿文つき。画像は「画像を見る」から保存してください。\n\n` + caption.slice(0, 3000),
             tags: ["camera"],

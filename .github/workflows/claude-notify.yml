@@ -35,7 +35,7 @@ jobs:
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              topic: process.env.NTFY_TOPIC,
+              topic: process.env.NTFY_TOPIC.trim().replace(/^https?:\/\/ntfy\.sh\//, "").replace(/\/+$/, ""),
               title: "🛠 " + process.env.PROJECT + "：Claude が " + commits.length + "件 作業しました",
               message: lines.join("\n").slice(0, 3500) + "\n（" + branch + "）",
               tags: ["robot"],
