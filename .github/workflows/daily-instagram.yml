@@ -1,0 +1,94 @@
+# 毎朝、その日の Instagram 投稿（画像＋投稿文）を読みもの・用語集から自動で作る
+#  - 作ったものは sns-auto ブランチに置く（最近 keepDays 日分だけ。サイトの公開には影響しない）
+#  - Secrets の NTFY_TOPIC があれば、投稿時間（sns/daily.config.json の postAt）にスマホへ通知する
+#  - 設定・順番は sns/daily.config.json と scripts/make-daily-post.mjs
+name: Daily Instagram post
+
+on:
+  schedule:
+    # 毎日 21:43 UTC = 日本時間 6:43
+    - cron: "43 21 * * *"
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "作る日（YYYY-MM-DD、空なら今日）"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-instagram
+  cancel-in-progress: false
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ccr-0d9e948d-9nfoh6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install rendering tools
+        run: |
+          npm install --no-save --package-lock=false playwright@1.62.1
+          npx playwright install --with-deps chromium
+          sudo apt-get install -y fonts-ipafont-gothic
+      - name: Get earlier posts
+        run: |
+          git clone --depth 1 -b sns-auto "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" out || mkdir -p out
+          rm -rf out/.git
+      - name: Make today's post
+        env:
+          PWPATH: ${{ github.workspace }}/node_modules/playwright
+          DATE_IN: ${{ inputs.date }}
+        run: |
+          if [ -n "$DATE_IN" ]; then node scripts/make-daily-post.mjs --out out --date "$DATE_IN"; else node scripts/make-daily-post.mjs --out out; fi
+      - name: Save to sns-auto branch
+        run: |
+          cat > out/README.md <<'MD'
+          # おやのて：インスタ投稿の自動作成
+
+          毎朝 GitHub Actions（daily-instagram.yml）が作ります。日付のフォルダに画像（01.jpg〜）と投稿文（caption.txt）があります。
+          一覧は index.json（新しい順）。古いものは自動で消えます。
+          MD
+          cd out
+          git init -q -b sns-auto
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -q -m "Daily Instagram posts $(date -u +%F)"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" HEAD:sns-auto
+      - name: Notify at posting time
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          REPO: ${{ github.repository }}
+        if: env.NTFY_TOPIC != ''
+        run: |
+          node - <<'JS'
+          const fs = require("fs");
+          const idx = JSON.parse(fs.readFileSync("out/index.json", "utf8"));
+          const p = idx.posts.find((x) => x.date === idx.updated);
+          const raw = (f) => `https://raw.githubusercontent.com/${process.env.REPO}/sns-auto/${f}`;
+          const caption = fs.readFileSync("out/" + p.caption, "utf8");
+          // 投稿時間（日本時間）に届くように予約。過ぎていたらすぐ送る
+          const at = Date.parse(`${p.date}T${p.postAt}:00+09:00`);
+          const body = {
+            topic: process.env.NTFY_TOPIC,
+            title: "📸 インスタ投稿の時間です：" + p.title,
+            message: `画像${p.images.length}枚・投稿文つき。画像は「画像を見る」から保存してください。\n\n` + caption.slice(0, 3000),
+            tags: ["camera"],
+            attach: raw(p.images[0]),
+            click: `https://github.com/${process.env.REPO}/tree/sns-auto/${p.date}`,
+            actions: [
+              { action: "view", label: "画像を見る", url: `https://github.com/${process.env.REPO}/tree/sns-auto/${p.date}` },
+              { action: "view", label: "投稿文", url: raw(p.caption) }
+            ]
+          };
+          if (at > Date.now() + 60e3) body.delay = String(Math.floor(at / 1000));
+          fetch("https://ntfy.sh/", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+            .then((r) => { console.log("ntfy", r.status, body.delay || "now"); if (!r.ok) process.exit(1); });
+          JS
