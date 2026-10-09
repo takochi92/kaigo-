@@ -2,7 +2,7 @@
 // 使い方:
 //   PWPATH=$(npm root -g)/playwright node scripts/make-daily-post.mjs --out ./out [--date 2026-10-10] [--list]
 //   --list はその日から先の予定を表示するだけ（画像は作らない）
-// 出力: <out>/<日付>/01.jpg… caption.txt post.json と <out>/index.json（新しい順の一覧）
+// 出力: <out>/<日付>/01.jpg… caption.txt x.txt atelier.json post.json と <out>/index.json（新しい順の一覧）
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -133,6 +133,25 @@ function captionFor(post) {
   ].join("\n");
 }
 
+// X 用（280 の重みで数える：全角2・半角1、URL は 23）
+const xLen = (t) => [...t.replace(/https?:\/\/\S+/g, "x".repeat(23))].reduce((n, c) => n + (c.charCodeAt(0) > 0x2ff ? 2 : 1), 0);
+function xFor(post) {
+  const tags = "#介護 #親の介護";
+  const build = (lines) => lines.filter((l) => l !== null).join("\n");
+  let lines;
+  if (post.kind === "article") {
+    const a = post.a;
+    lines = [a.title.split("｜")[0], "", ...a.summary.map((s) => "・" + s), "", `${SITE}/yomimono/${a.slug}.html`, tags];
+    // 長ければポイントを後ろから減らす
+    while (xLen(build(lines)) > 280 && lines.filter((l) => l.startsWith("・")).length > 1) lines.splice(lines.findLastIndex((l) => l.startsWith("・")), 1);
+  } else {
+    lines = ["介護のことば📖", "", ...post.terms.map((t) => "■" + t[1]), "", "意味はこちら（全" + TERMS.length + "語）", `${SITE}/yougo.html`, tags];
+  }
+  let t = build(lines);
+  while (xLen(t) > 280) t = t.replace(/\n[^\n]*$/, "");
+  return t;
+}
+
 // ---- 作る ---------------------------------------------------------------------
 const post = postFor(DATE);
 const dir = path.join(OUT, DATE);
@@ -155,7 +174,15 @@ await browser.close();
 
 const caption = captionFor(post);
 fs.writeFileSync(path.join(dir, "caption.txt"), caption + "\n");
-const meta = { date: DATE, postAt: CONF.postAt, kind: post.kind, key: post.key, title: post.title, images: files, caption };
+const xText = xFor(post);
+fs.writeFileSync(path.join(dir, "x.txt"), xText + "\n");
+// Atelier（投稿の下書き置き場）に送る形。同じ日・媒体・slot は上書きされる
+const atelier = { posts: [
+  { project: "care", channel: "Instagram", date: DATE, slot: "morning", text: caption },
+  { project: "care", channel: "X", date: DATE, slot: "morning", text: xText }
+] };
+fs.writeFileSync(path.join(dir, "atelier.json"), JSON.stringify(atelier, null, 2) + "\n");
+const meta = { date: DATE, postAt: CONF.postAt, kind: post.kind, key: post.key, title: post.title, images: files, caption, x: xText };
 fs.writeFileSync(path.join(dir, "post.json"), JSON.stringify(meta, null, 2) + "\n");
 
 // 一覧（新しい順）。keepDays より古いフォルダは消す
@@ -164,7 +191,7 @@ const list = [];
 for (const d of fs.readdirSync(OUT).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort().reverse()) {
   if (d < keepFrom) { fs.rmSync(path.join(OUT, d), { recursive: true, force: true }); continue; }
   const m = JSON.parse(fs.readFileSync(path.join(OUT, d, "post.json"), "utf8"));
-  list.push({ date: m.date, postAt: m.postAt, title: m.title, images: m.images.map((f) => `${d}/${f}`), caption: `${d}/caption.txt` });
+  list.push({ date: m.date, postAt: m.postAt, title: m.title, images: m.images.map((f) => `${d}/${f}`), caption: `${d}/caption.txt`, x: `${d}/x.txt`, atelier: `${d}/atelier.json` });
 }
 fs.writeFileSync(path.join(OUT, "index.json"), JSON.stringify({ updated: DATE, posts: list }, null, 2) + "\n");
 console.log(`${DATE}: ${post.title}（${files.length}枚）→ ${dir}`);
