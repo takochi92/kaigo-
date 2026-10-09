@@ -84,7 +84,10 @@ jobs:
           // URL の形でなければ、Atelier の公開アドレスを使う（URL は秘密ではない）
           const site = (!found ? "https://atelier-task-studio.politechar16.chatgpt.site" : /^https?:/.test(found[0]) ? found[0] : "https://" + found[0]).replace(/\/api\/posts\/?$/, "").replace(/\/+$/, "");
           (async () => {
-            for (const post of posts) {
+            // 画像（sns-auto ブランチの公開URL）も images として付ける。受け付けられなければ文だけで送り直す
+            const raw = (f) => `https://raw.githubusercontent.com/${process.env.GITHUB_REPOSITORY}/sns-auto/${f}`;
+            const images = p.images.map(raw);
+            const send = async (post) => {
               const r = await fetch(site + "/api/posts", {
                 method: "POST",
                 headers: {
@@ -95,8 +98,14 @@ jobs:
                 body: JSON.stringify(post)
               });
               const body = await r.json().catch(() => ({}));
-              if (!r.ok || !body.ok) { console.error(`Atelier ${post.channel}: failed (${r.status}) ${body.error || ""}`); process.exitCode = 1; continue; }
-              console.log(`${body.post.project} / ${body.post.channel} / ${body.post.date}: saved`);
+              return { ok: r.ok && body.ok, status: r.status, body };
+            };
+            for (const post of posts) {
+              let res = await send({ ...post, images, image_url: images[0] });
+              if (!res.ok) { console.log(`画像つきは受け付けられず (${res.status}) ${res.body.error || ""}。文だけで送り直します`); res = await send(post); }
+              if (!res.ok) { console.error(`Atelier ${post.channel}: failed (${res.status}) ${res.body.error || ""}`); process.exitCode = 1; continue; }
+              const saved = res.body.post || {};
+              console.log(`${saved.project} / ${saved.channel} / ${saved.date}: saved（保存された項目: ${Object.keys(saved).join(", ")}）`);
             }
           })();
           JS
