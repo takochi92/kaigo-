@@ -89,6 +89,18 @@ jobs:
             ]
           };
           if (at > Date.now() + 60e3) body.delay = String(Math.floor(at / 1000));
-          fetch("https://ntfy.sh/", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
-            .then((r) => { console.log("ntfy", r.status, body.delay || "now"); if (!r.ok) process.exit(1); });
+          // 断られたら、画像の添付→予約の順に外して送り直す（通知が届かなくても投稿づくりは成功のまま）
+          const send = async (b) => {
+            const r = await fetch("https://ntfy.sh/", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) });
+            console.log("ntfy", r.status, b.delay || "now", b.attach ? "attach" : "", r.ok ? "" : await r.text());
+            return r.ok;
+          };
+          (async () => {
+            if (await send(body)) return;
+            delete body.attach;
+            if (await send(body)) return;
+            delete body.delay;
+            body.title = "📸 今夜" + p.postAt + "の投稿：" + p.title;
+            await send(body);
+          })();
           JS
