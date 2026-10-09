@@ -48,7 +48,7 @@ Google検索に出すには、[Google Search Console](https://search.google.com/
 
 ## インスタ投稿の自動作成
 
-`.github/workflows/daily-instagram.yml` が毎朝（日本時間 6:43）、読みもの・用語集からその日の投稿（1080×1350 の画像と投稿文）を作り、`sns-auto` ブランチの日付フォルダに置きます。Secrets の `NTFY_TOPIC` があれば、投稿時間（`sns/daily.config.json` の `postAt`）にスマホへ通知します。順番の確認は `node scripts/make-daily-post.mjs --list`。
+`.github/workflows/daily-instagram.yml` が毎朝（日本時間 6:43）、読みもの・用語集からその日の投稿（1080×1350 の画像と投稿文）を作り、`sns-auto` ブランチの日付フォルダに置きます。原稿は Atelier の「自動作成された投稿」にも送ります（Secrets の `ATELIER_*`）。順番の確認は `node scripts/make-daily-post.mjs --list`。
 
 ## Claude の作業通知
 

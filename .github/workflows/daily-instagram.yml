@@ -1,6 +1,5 @@
 # 毎朝、その日の Instagram 投稿（画像＋投稿文）を読みもの・用語集から自動で作る
 #  - 作ったものは sns-auto ブランチに置く（最近 keepDays 日分だけ。サイトの公開には影響しない）
-#  - Secrets の NTFY_TOPIC があれば、投稿時間（sns/daily.config.json の postAt）にスマホへ通知する
 #  - Secrets の ATELIER_SITE_URL・ATELIER_SERVICE_TOKEN・ATELIER_INGEST_TOKEN があれば、Instagram 原稿を Atelier の下書きに送る
 #  - 設定・順番は sns/daily.config.json と scripts/make-daily-post.mjs
 name: Daily Instagram post
@@ -99,49 +98,5 @@ jobs:
               if (!r.ok || !body.ok) { console.error(`Atelier ${post.channel}: failed (${r.status}) ${body.error || ""}`); process.exitCode = 1; continue; }
               console.log(`${body.post.project} / ${body.post.channel} / ${body.post.date}: saved`);
             }
-          })();
-          JS
-      - name: Notify at posting time
-        env:
-          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
-          REPO: ${{ github.repository }}
-        if: env.NTFY_TOPIC != ''
-        run: |
-          node - <<'JS'
-          const fs = require("fs");
-          const idx = JSON.parse(fs.readFileSync("out/index.json", "utf8"));
-          const p = idx.posts.find((x) => x.date === idx.updated);
-          const raw = (f) => `https://raw.githubusercontent.com/${process.env.REPO}/sns-auto/${f}`;
-          const caption = fs.readFileSync("out/" + p.caption, "utf8");
-          // 投稿時間（日本時間）に届くように予約。過ぎていたらすぐ送る
-          const at = Date.parse(`${p.date}T${p.postAt}:00+09:00`);
-          const t = process.env.NTFY_TOPIC;
-          console.log("topic check: length", t.length, "url", /:\/\//.test(t), "space", /\s/.test(t), "slash", t.includes("/"));
-          const body = {
-            topic: process.env.NTFY_TOPIC.trim().replace(/^https?:\/\/ntfy\.sh\//, "").replace(/\/+$/, ""),
-            title: "📸 インスタ投稿の時間です：" + p.title,
-            message: `画像${p.images.length}枚・投稿文つき。画像は「画像を見る」から保存してください。\n\n` + caption.slice(0, 3000),
-            tags: ["camera"],
-            attach: raw(p.images[0]),
-            click: `https://github.com/${process.env.REPO}/tree/sns-auto/${p.date}`,
-            actions: [
-              { action: "view", label: "画像を見る", url: `https://github.com/${process.env.REPO}/tree/sns-auto/${p.date}` },
-              { action: "view", label: "投稿文", url: raw(p.caption) }
-            ]
-          };
-          if (at > Date.now() + 60e3) body.delay = String(Math.floor(at / 1000));
-          // 断られたら、画像の添付→予約の順に外して送り直す（通知が届かなくても投稿づくりは成功のまま）
-          const send = async (b) => {
-            const r = await fetch("https://ntfy.sh/", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(b) });
-            console.log("ntfy", r.status, b.delay || "now", b.attach ? "attach" : "", r.ok ? "" : await r.text());
-            return r.ok;
-          };
-          (async () => {
-            if (await send(body)) return;
-            delete body.attach;
-            if (await send(body)) return;
-            delete body.delay;
-            body.title = "📸 今夜" + p.postAt + "の投稿：" + p.title;
-            await send(body);
           })();
           JS
