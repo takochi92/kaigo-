@@ -3,7 +3,7 @@
   "gaId": "G-Z1JQW02KGJ",
   "ptNote": {
     "note": "PT国試ドリル（pt/）に載せる note。user に note のID（note.com/〇〇 の〇〇）を入れると、ビルド時に最新記事を取り込みます。membershipUrl を入れるとメンバーシップ・マガジンへの案内ボタンになります。",
-    "user": "",
+    "user": "8192844",
     "membershipUrl": ""
   }
 }
