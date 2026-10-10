@@ -471,6 +471,37 @@ function copyStatic() {
   }
 }
 
+// PT国試ドリル（pt/）に載せる note の最新記事を RSS から取り込む（取れなくてもビルドは続ける）
+async function writePtNote() {
+  const cfg = SITE_CONFIG.ptNote || {};
+  const user = String(cfg.user || "").trim().replace(/^https?:\/\/note\.com\//, "").replace(/\/.*$/, "");
+  const out = { profile: user ? `https://note.com/${user}` : "", membership: cfg.membershipUrl || "", items: [] };
+  if (user) {
+    try {
+      const res = await fetch(`https://note.com/${encodeURIComponent(user)}/rss`, { signal: AbortSignal.timeout(20000) });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const xml = await res.text();
+      const tag = (item, name) => {
+        const m = item.match(new RegExp(`<${name}[^>]*>([\\s\\S]*?)</${name}>`));
+        return m ? m[1].replace(/^<!\[CDATA\[|\]\]>$/g, "").trim() : "";
+      };
+      for (const [, item] of xml.matchAll(/<item>([\s\S]*?)<\/item>/g)) {
+        const date = new Date(tag(item, "pubDate"));
+        out.items.push({
+          title: tag(item, "title").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'"),
+          link: tag(item, "link"),
+          date: isNaN(date) ? "" : `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`,
+          thumb: (item.match(/<media:thumbnail[^>]*>([^<]+)<\/media:thumbnail>/) || item.match(/<media:thumbnail[^>]*url="([^"]+)"/) || [])[1] || ""
+        });
+      }
+      out.items = out.items.filter((it) => /^https:\/\/note\.com\//.test(it.link)).slice(0, 12);
+    } catch (err) {
+      console.warn(`note の取り込みに失敗（記事なしで続行）: ${err.message}`);
+    }
+  }
+  write("pt/note.json", JSON.stringify(out));
+}
+
 function write(rel, content) {
   const file = path.join(DIST, rel);
   fs.mkdirSync(path.dirname(file), { recursive: true });
@@ -718,6 +749,7 @@ ${parentPages.length ? `<h2>政令指定都市（区ごと）</h2><div class="ch
   for (const p of ["", "index.html", "search.html", "manga.html", "seido.html", "shisetsu-shurui.html", "shisetsu.html", "jigyo.html", "faq.html", "yougo.html", "tsugi.html", "hiyou.html", "kengaku.html", "about.html", "policy.html", "contact.html", "share.html", "sources.html"]) {
     if (p !== "index.html") urls.unshift(`${SITE_URL}/${p}`);
   }
+  for (const p of ["pt/", "pt/mypage.html"]) urls.unshift(`${SITE_URL}/${p}`);
   const chunks = [];
   for (let i = 0; i < urls.length; i += 45000) chunks.push(urls.slice(i, i + 45000));
   chunks.forEach((list, i) => {
@@ -726,6 +758,7 @@ ${parentPages.length ? `<h2>政令指定都市（区ごと）</h2><div class="ch
   write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${chunks.map((_, i) => `<sitemap><loc>${SITE_URL}/sitemap-${i + 1}.xml</loc><lastmod>${builtAt}</lastmod></sitemap>`).join("\n")}\n</sitemapindex>\n`);
   write("robots.txt", `User-agent: *\nAllow: /\nSitemap: ${SITE_URL}/sitemap.xml\n`);
   write(".nojekyll", "");
+  await writePtNote();
   addShareTags();
 
   const total = areas.reduce((n, a) => n + a.count, 0);

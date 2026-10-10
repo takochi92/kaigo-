@@ -17,6 +17,7 @@
 | `shisetsu.html` | 相談窓口：地域包括支援センターの探し方、全国の電話相談 |
 | `jigyo.html` | 事業者向け：指定要件・開業の流れ・チェックリスト |
 | `faq.html` | よくある質問 |
+| `pt/` | 理学療法士 国家試験対策「PT国試ドリル」。回・分野を選んで解く（`pt/quiz.html`）、正答率・苦手分野のグラフ（`pt/mypage.html`、記録は端末のブラウザに保存）。問題は `pt/questions.js`。note の最新記事は `site.config.json` の `ptNote.user` を入れるとビルド時に `pt/note.json` へ取り込む |
 
 ## 事業所データ（国のオープンデータ）
 
