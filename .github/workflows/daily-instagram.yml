@@ -1,6 +1,6 @@
 # 毎朝、その日の Instagram 投稿（画像＋投稿文）を読みもの・用語集から自動で作る
 #  - 作ったものは sns-auto ブランチに置く（最近 keepDays 日分だけ。サイトの公開には影響しない）
-#  - Secrets の ATELIER_SITE_URL・ATELIER_SERVICE_TOKEN・ATELIER_INGEST_TOKEN があれば、Instagram 原稿を Atelier の下書きに送る
+#  - AFE ポータルは sns-auto/index.json から原稿と画像を読み取る
 #  - 設定・順番は sns/daily.config.json と scripts/make-daily-post.mjs
 name: Daily Instagram post
 
@@ -62,50 +62,3 @@ jobs:
           git add -A
           git commit -q -m "Daily Instagram posts $(date -u +%F)"
           git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" HEAD:sns-auto
-      # 持ち主の下書き置き場 Atelier（自動作成された投稿）に、おやのての Instagram 原稿を入れる
-      - name: Send draft to Atelier
-        env:
-          ATELIER_SITE_URL: ${{ secrets.ATELIER_SITE_URL }}
-          ATELIER_SERVICE_TOKEN: ${{ secrets.ATELIER_SERVICE_TOKEN }}
-          ATELIER_INGEST_TOKEN: ${{ secrets.ATELIER_INGEST_TOKEN }}
-        if: env.ATELIER_SITE_URL != '' && env.ATELIER_INGEST_TOKEN != ''
-        run: |
-          node - <<'JS'
-          const fs = require("fs");
-          const idx = JSON.parse(fs.readFileSync("out/index.json", "utf8"));
-          const p = idx.posts.find((x) => x.date === idx.updated);
-          const { posts } = JSON.parse(fs.readFileSync(`out/${p.date}/atelier.json`, "utf8"));
-          // Secrets に引用符・"site_url":・https:// なし・/api/posts つきで入っていても読めるようにする
-          const clean = (v) => (v || "").trim().replace(/^.*?:\s*(?=["'])/, "").replace(/^["']+|["',\s]+$/g, "").trim();
-          const rawSite = clean(process.env.ATELIER_SITE_URL);
-          console.log("site check: length", rawSite.length, "scheme", /^https?:\/\//.test(rawSite), "space", /\s/.test(rawSite), "quote", /["']/.test(rawSite));
-          console.log("token check: service", clean(process.env.ATELIER_SERVICE_TOKEN).length, "ingest", clean(process.env.ATELIER_INGEST_TOKEN).length);
-          const found = rawSite.match(/https?:\/\/[^\s"',]+/) || rawSite.match(/[a-z0-9.-]+\.[a-z]{2,}(\/[^\s"',]*)?/i);
-          // URL の形でなければ、Atelier の公開アドレスを使う（URL は秘密ではない）
-          const site = (!found ? "https://atelier-task-studio.politechar16.chatgpt.site" : /^https?:/.test(found[0]) ? found[0] : "https://" + found[0]).replace(/\/api\/posts\/?$/, "").replace(/\/+$/, "");
-          (async () => {
-            // 画像（sns-auto ブランチの公開URL）も images として付ける。受け付けられなければ文だけで送り直す
-            const raw = (f) => `https://raw.githubusercontent.com/${process.env.GITHUB_REPOSITORY}/sns-auto/${f}`;
-            const images = p.images.map(raw);
-            const send = async (post) => {
-              const r = await fetch(site + "/api/posts", {
-                method: "POST",
-                headers: {
-                  "content-type": "application/json",
-                  "OAI-Sites-Authorization": "Bearer " + clean(process.env.ATELIER_SERVICE_TOKEN),
-                  "x-atelier-token": clean(process.env.ATELIER_INGEST_TOKEN)
-                },
-                body: JSON.stringify(post)
-              });
-              const body = await r.json().catch(() => ({}));
-              return { ok: r.ok && body.ok, status: r.status, body };
-            };
-            for (const post of posts) {
-              let res = await send({ ...post, images, image_url: images[0] });
-              if (!res.ok) { console.log(`画像つきは受け付けられず (${res.status}) ${res.body.error || ""}。文だけで送り直します`); res = await send(post); }
-              if (!res.ok) { console.error(`Atelier ${post.channel}: failed (${res.status}) ${res.body.error || ""}`); process.exitCode = 1; continue; }
-              const saved = res.body.post || {};
-              console.log(`${saved.project} / ${saved.channel} / ${saved.date}: saved（保存された項目: ${Object.keys(saved).join(", ")}）`);
-            }
-          })();
-          JS
