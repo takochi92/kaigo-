@@ -68,4 +68,3 @@ for (const file of sitemapFiles) {
 if (fs.existsSync(path.join(root,'tests')) || fs.existsSync(path.join(root,'scripts'))) errors.push('Development files copied to dist');
 if(errors.length){console.error(errors.slice(0,50).join('\n'));console.error(`${errors.length} errors`);process.exit(1);}
 console.log(`Validated ${pages.length} pages, ${links} internal links, scripts, canonical URLs and sitemap.`);
-

@@ -16,4 +16,3 @@
     "check": "node scripts/check-site.mjs"
   }
 }
-

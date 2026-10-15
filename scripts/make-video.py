@@ -22,4 +22,3 @@ for ep in sorted({os.path.basename(f).split("-")[0] for f in glob.glob("frames/e
             "-c:a", "aac", "-b:a", "96k", "-shortest", "-movflags", "+faststart", f"{OUT}/{ep}.mp4"]
     subprocess.run(cmd, check=True)
     print(ep, round(sum(durs), 1), "秒")
-
