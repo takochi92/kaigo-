@@ -56,7 +56,9 @@ const CSS = `
 
   const shot = async (name) => {
     await p.waitForTimeout(150);
-    await (await p.$("#ig .slide")).screenshot({ path: `${OUT}/${name}.png` });
+    const slide = await p.$("#ig .slide");
+    await slide.screenshot({ path: `${OUT}/${name}.png` });
+    await slide.screenshot({ path: `${OUT}/${name}.jpg`, type: "jpeg", quality: 90 });
   };
 
   for (const [ei, ep] of eps.entries()) {

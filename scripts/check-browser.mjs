@@ -21,9 +21,11 @@ try {
  const page=await browser.newPage();
  await page.route('**/*',route=>new URL(route.request().url()).hostname==='127.0.0.1'?route.continue():route.abort());
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
- const pages=fs.readdirSync(root).filter(f=>f.endsWith('.html')&&f!=='404.html').concat(fs.readdirSync(path.join(root,'yomimono')).filter(f=>f.endsWith('.html')).map(f=>'yomimono/'+f));
+ const pages=fs.readdirSync(root).filter(f=>f.endsWith('.html')&&f!=='404.html')
+  .concat(fs.readdirSync(path.join(root,'yomimono')).filter(f=>f.endsWith('.html')).map(f=>'yomimono/'+f))
+  .concat(['area/index.html','area/13/13104.html','area/34/34100.html']);
  const base=`http://127.0.0.1:${server.address().port}/`;
- for(const width of [320,390,1280]){
+ for(const width of [320,390,768,1280]){
   await page.setViewportSize({width,height:844});
   for(const file of pages){
    await page.goto(base+file,{waitUntil:'domcontentloaded'});
@@ -51,5 +53,5 @@ try {
  assert.ok(await fallback.locator('header a[href="search.html"]').count());
  await nojs.close();
  assert.deepEqual(errors,[]);
- console.log(`Browser checks passed for ${pages.length} pages at 320/390/1280px, standard/large text, table widths, menu and checklist.`);
+ console.log(`Browser checks passed for ${pages.length} pages at 320/390/768/1280px, standard/large text, table widths, menu and checklist.`);
 } finally {if(browser)await browser.close();await new Promise(resolve=>server.close(resolve));}

@@ -1,0 +1,50 @@
+name: Release weekly manga
+
+on:
+  schedule:
+    # 日曜日 03:00 JST。公開後、refresh-sns が画像と動画を作り直す。
+    - cron: "0 18 * * 6"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: weekly-manga
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ccr-0d9e948d-9nfoh6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Generate due episodes
+        run: node scripts/make-manga.mjs
+      - name: Commit released episodes
+        id: release
+        run: |
+          if git diff --quiet -- manga.html; then
+            echo "No new episode is due."
+            echo "released=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add manga.html
+          git commit -m "Release weekly Oyanote manga"
+          git pull --rebase origin ccr-0d9e948d-9nfoh6
+          git push origin HEAD:ccr-0d9e948d-9nfoh6
+          echo "released=true" >> "$GITHUB_OUTPUT"
+      - name: Render Instagram images and videos
+        if: steps.release.outputs.released == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run refresh-sns.yml --ref ccr-0d9e948d-9nfoh6
