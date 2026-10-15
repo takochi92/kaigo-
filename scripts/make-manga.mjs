@@ -8,6 +8,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { ARTICLES } from "../content/articles.mjs";
+import { MANGA_QUEUE, mangaReleaseDate } from "../content/manga-queue.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
@@ -327,6 +329,31 @@ const EPISODES = [
     links: [["在宅での看取りと人生会議", "yomimono/mitori.html"], ["訪問看護を探す", "search.html?cat=houkan"]]
   }
 ];
+
+const dateArg = process.argv.indexOf("--as-of");
+const asOf = dateArg >= 0 ? process.argv[dateArg + 1] : new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+if (!/^\d{4}-\d{2}-\d{2}$/.test(asOf)) throw new Error("--as-of は YYYY-MM-DD で指定してください");
+if (process.argv.includes("--list")) {
+  MANGA_QUEUE.forEach((item, i) => console.log(mangaReleaseDate(i), `第${i + 8}話`, item.title));
+  process.exit(0);
+}
+for (const [i, item] of MANGA_QUEUE.entries()) {
+  if (mangaReleaseDate(i) > asOf) break;
+  const article = ARTICLES.find((a) => a.slug === item.slug);
+  if (!article || article.summary.length !== 3 || item.answers.length !== 3)
+    throw new Error(`まんがの元記事またはセリフが不足しています: ${item.slug}`);
+  EPISODES.push({
+    id: `ep${i + 8}`, title: item.title, sub: item.sub,
+    panels: [
+      { bg: "living", people: [["sakura-worry", 18], ["hanako", 64]], bubbles: [[4, 3, 88, item.question, "l"]], narr: article.lead },
+      { bg: "houkatsu", people: [["caremane", 12], ["sakura", 68]], bubbles: [[3, 3, 88, item.answers[0], "l"]], narr: article.summary[0] },
+      { bg: "living", people: [["sakura", 20], ["hanako", 65]], bubbles: [[3, 3, 88, item.answers[1], "l"]], narr: article.summary[1] },
+      { bg: "houkatsu", people: [["caremane", 12], ["sakura", 68]], bubbles: [[3, 3, 88, item.answers[2], "l"]], narr: article.summary[2] }
+    ],
+    points: article.summary,
+    links: [["くわしく読む", `yomimono/${item.slug}.html`], ["相談窓口の探し方", "shisetsu.html"]]
+  });
+}
 
 // 写真の縦横（JPEGのSOFから読む）
 for (const v of Object.values(PHOTO)) {

@@ -7,11 +7,12 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { createRequire } from "node:module";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { ARTICLES } from "../content/articles.mjs";
 import { TERMS } from "../content/glossary.mjs";
+import { MANGA_QUEUE, mangaReleaseDate } from "../content/manga-queue.mjs";
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SITE = "https://oyanote-care.com";
 const CONF = JSON.parse(fs.readFileSync(path.join(ROOT, "sns/daily.config.json"), "utf8"));
 
@@ -48,11 +49,15 @@ for (let i = 0; i < Math.max(articlePosts.length, termPosts.length); i++) {
 }
 const dayIndex = (d) => Math.round((Date.parse(d) - Date.parse(CONF.startDate)) / 86400e3);
 const postFor = (d) => PLAN[((dayIndex(d) % PLAN.length) + PLAN.length) % PLAN.length];
+const mangaFor = (d) => {
+  const index = MANGA_QUEUE.findIndex((_, i) => mangaReleaseDate(i) === d);
+  return index < 0 ? null : { kind: "manga", key: `manga-ep${index + 8}`, title: MANGA_QUEUE[index].title, episode: index + 8, item: MANGA_QUEUE[index] };
+};
 
 if (process.argv.includes("--list")) {
   for (let k = 0; k < PLAN.length; k++) {
     const d = new Date(Date.parse(DATE) + k * 86400e3).toISOString().slice(0, 10);
-    console.log(d, postFor(d).title);
+    console.log(d, (mangaFor(d) || postFor(d)).title);
   }
   process.exit(0);
 }
@@ -113,6 +118,15 @@ function slidesFor(post) {
 }
 
 function captionFor(post) {
+  if (post.kind === "manga") {
+    const article = ARTICLES.find((a) => a.slug === post.item.slug);
+    return [
+      `まんがでわかる介護 第${post.episode}話`, `「${post.title}」`, "",
+      ...article.summary.map((s) => "・" + s), "",
+      `続きと詳しい説明はプロフィールのリンク（おやのて）から。`,
+      `${SITE}/manga.html#ep${post.episode}`, "", CONF.hashtags.article
+    ].join("\n");
+  }
   if (post.kind === "article") {
     const a = post.a;
     return [
@@ -136,6 +150,7 @@ function captionFor(post) {
 // X 用（280 の重みで数える：全角2・半角1、URL は 23）
 const xLen = (t) => [...t.replace(/https?:\/\/\S+/g, "x".repeat(23))].reduce((n, c) => n + (c.charCodeAt(0) > 0x2ff ? 2 : 1), 0);
 function xFor(post) {
+  if (post.kind === "manga") return `まんがでわかる介護 第${post.episode}話「${post.title}」\n${SITE}/manga.html#ep${post.episode}\n#介護 #親の介護`;
   const tags = "#介護 #親の介護";
   const build = (lines) => lines.filter((l) => l !== null).join("\n");
   let lines;
@@ -153,24 +168,35 @@ function xFor(post) {
 }
 
 // ---- 作る ---------------------------------------------------------------------
-const post = postFor(DATE);
+const post = mangaFor(DATE) || postFor(DATE);
 const dir = path.join(OUT, DATE);
 fs.mkdirSync(dir, { recursive: true });
-const slides = slidesFor(post);
-const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PWPATH || "playwright");
-const tmp = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "daily-")), "slide.html");
-const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 360, height: 450 }, deviceScaleFactor: 3 });
 const files = [];
-for (let i = 0; i < slides.length; i++) {
-  fs.writeFileSync(tmp, `<!doctype html><html lang="ja"><head><meta charset="utf-8"><base href="${pathToFileURL(ROOT + "/").href}"><style>${CSS}</style></head><body>${slides[i]}</body></html>`);
-  await page.goto(pathToFileURL(tmp).href, { waitUntil: "load" });
-  const name = String(i + 1).padStart(2, "0") + ".jpg";
-  await (await page.$(".slide")).screenshot({ path: path.join(dir, name), type: "jpeg", quality: 90 });
-  files.push(name);
+if (post.kind === "manga") {
+  const sourceDir = path.join(ROOT, "sns/instagram");
+  const source = fs.readdirSync(sourceDir).filter((f) => new RegExp(`^ep${post.episode}-\\d+\\.jpg$`).test(f)).sort();
+  if (source.length < 3 || source.length > 10) throw new Error(`第${post.episode}話の画像が揃っていません`);
+  source.forEach((f, i) => {
+    const name = String(i + 1).padStart(2, "0") + ".jpg";
+    fs.copyFileSync(path.join(sourceDir, f), path.join(dir, name));
+    files.push(name);
+  });
+} else {
+  const slides = slidesFor(post);
+  const require = createRequire(import.meta.url);
+  const { chromium } = require(process.env.PWPATH || "playwright");
+  const tmp = path.join(fs.mkdtempSync(path.join(os.tmpdir(), "daily-")), "slide.html");
+  const browser = await chromium.launch();
+  const page = await browser.newPage({ viewport: { width: 360, height: 450 }, deviceScaleFactor: 3 });
+  for (let i = 0; i < slides.length; i++) {
+    fs.writeFileSync(tmp, `<!doctype html><html lang="ja"><head><meta charset="utf-8"><base href="${pathToFileURL(ROOT + "/").href}"><style>${CSS}</style></head><body>${slides[i]}</body></html>`);
+    await page.goto(pathToFileURL(tmp).href, { waitUntil: "load" });
+    const name = String(i + 1).padStart(2, "0") + ".jpg";
+    await (await page.$(".slide")).screenshot({ path: path.join(dir, name), type: "jpeg", quality: 90 });
+    files.push(name);
+  }
+  await browser.close();
 }
-await browser.close();
 
 const caption = captionFor(post);
 fs.writeFileSync(path.join(dir, "caption.txt"), caption + "\n");

@@ -18,7 +18,7 @@ const CSS = `
   .bar .n { background: #fff; color: #4f8a1f; padding: 0 6px; }
   .slide .scene { order: 2; width: 360px; height: 360px; aspect-ratio: auto; border-bottom: 2px solid #2b3027; flex: none; }
   .slide .scene .koma { display: none; }
-  .slide::after { content: "おやのて ＠kaigonavi"; position: absolute; left: 0; right: 0; bottom: 0; height: 34px; display: flex; align-items: center; justify-content: center; background: #4f8a1f; color: #fff; font-size: 12.5px; font-weight: 700; }
+  .slide::after { content: "おやのて ＠oyanote"; position: absolute; left: 0; right: 0; bottom: 0; height: 34px; display: flex; align-items: center; justify-content: center; background: #4f8a1f; color: #fff; font-size: 12.5px; font-weight: 700; }
   .slide .cap { order: 1; flex: none; min-height: 118px; box-sizing: border-box; background: #eef6e1; padding: 12px 16px; font-size: 15px; line-height: 1.7; display: flex; align-items: center; }
   .cover { background: #eef6e1; padding: 70px 22px 0; box-sizing: border-box; }
   .cover .ep { display: inline-block; background: #e8792b; color: #fff; font-weight: 700; font-size: 15px; padding: 3px 10px; }

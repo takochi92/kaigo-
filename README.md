@@ -9,7 +9,7 @@
 | `index.html` | トップ：利用開始までの流れ、都道府県別の入り口、困りごと別の連絡先 |
 | `search.html` | 全国の介護事業所・病院検索（都道府県・市区町村・サービス種類・キーワード・現在地から近い順） |
 | `area/〇〇/〇〇〇〇〇.html` | 市区町村ごとの事業所一覧ページ（ビルド時に自動生成。Google検索向け） |
-| `manga.html` | まんがでわかる介護（全4話。`npm run manga` で `scripts/make-manga.mjs` から生成） |
+| `manga.html` | まんがでわかる介護（現在7話。`npm run manga` で `scripts/make-manga.mjs` から生成） |
 | `yomimono/` | 読みもの（記事）。`content/articles.mjs` を直して `npm run articles` で作り直す |
 | `yougo.html` | 介護・医療の用語集（`content/glossary.mjs`） |
 | `seido.html` | 介護保険のしくみ |
@@ -48,7 +48,11 @@ Google検索に出すには、[Google Search Console](https://search.google.com/
 
 ## インスタ投稿の自動作成
 
-`.github/workflows/daily-instagram.yml` が毎朝（日本時間 6:43）、読みもの・用語集からその日の投稿（1080×1350 の画像と投稿文）を作り、`sns-auto` ブランチの日付フォルダに置きます。原稿は Atelier の「自動作成された投稿」にも送ります（Secrets の `ATELIER_*`）。順番の確認は `node scripts/make-daily-post.mjs --list`。
+`.github/workflows/daily-instagram.yml` が毎朝（日本時間 6:43）、読みもの・用語集からその日の投稿（1080×1350 の画像と投稿文）を作り、`sns-auto` ブランチの日付フォルダに置きます。日曜日は、その日に公開されたまんがの画像と投稿文を使います。順番の確認は `node scripts/make-daily-post.mjs --list`。投稿の推奨時刻は日本時間 10:00 です。
+
+`content/manga-queue.mjs` に用意した7題は、`.github/workflows/weekly-manga.yml` が2026年10月18日から毎週日曜日03:00（日本時間）に1話ずつ公開します。画像・動画は続けて `refresh-sns.yml` で生成します。用意した題材が尽きたら自動生成は止まるため、内容を確認した新しい題材をキューに追加してください。
+
+Instagram @oyanote への登録は、Codex の「おやのて Instagram 毎日1件」定期実行が Metricool 連携を使い、`sns-auto` の画像と投稿文を確認してから行います。登録時は自動公開を指定し、同日の重複予約を避けます。GitHub Actions だけでは Metricool への投稿は行いません。
 
 ## Claude の作業通知
 
