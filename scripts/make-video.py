@@ -7,7 +7,7 @@ for ep in sorted({os.path.basename(f).split("-")[0] for f in glob.glob("frames/e
     fs = sorted(glob.glob(f"frames/{ep}-*.png"))
     durs = [2.5] + [4.5] * (len(fs) - 2) + [5.0]
     T = 0.4
-    cmd = ["ffmpeg", "-y", "-loglevel", "error"]
+    cmd = [os.environ.get("FFMPEG", "ffmpeg"), "-y", "-loglevel", "error"]
     for f, d in zip(fs, durs):
         cmd += ["-loop", "1", "-t", str(d + T), "-i", f]
     cmd += ["-f", "lavfi", "-t", str(sum(durs) + T), "-i", "anullsrc=r=44100:cl=stereo"]
@@ -22,3 +22,4 @@ for ep in sorted({os.path.basename(f).split("-")[0] for f in glob.glob("frames/e
             "-c:a", "aac", "-b:a", "96k", "-shortest", "-movflags", "+faststart", f"{OUT}/{ep}.mp4"]
     subprocess.run(cmd, check=True)
     print(ep, round(sum(durs), 1), "秒")
+

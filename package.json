@@ -1,5 +1,5 @@
 {
-  "name": "kaigo-navi",
+  "name": "oyanote",
   "version": "1.0.0",
   "private": true,
   "description": "介護の制度・相談窓口・全国の介護事業所検索サイト",
@@ -16,3 +16,4 @@
     "check": "node scripts/check-site.mjs"
   }
 }
+

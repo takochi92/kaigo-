@@ -46,9 +46,19 @@ for (const [file,{doc}] of known) {
     links++;
   }
 }
-for (const file of files.filter(f=>/sitemap-\d+\.xml$/.test(f))) {
+const sitemapFiles = files.filter(f=>/sitemap-\d+\.xml$/.test(f));
+const index = fs.readFileSync(path.join(root, 'sitemap.xml'), 'utf8');
+const indexed = [...index.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => unescape(m[1]));
+const expected = sitemapFiles.map(f => new URL(path.basename(f), site).href);
+if (indexed.length !== expected.length || new Set(indexed).size !== indexed.length || expected.some(url => !indexed.includes(url)))
+  errors.push('sitemap index does not match generated sitemap files');
+const listed = new Set();
+for (const file of sitemapFiles) {
   for (const m of fs.readFileSync(file,'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)) {
     const url=new URL(unescape(m[1]));
+    if (url.origin !== siteUrl.origin) errors.push(`sitemap: wrong origin ${url.href}`);
+    if (listed.has(url.href)) errors.push(`sitemap: duplicate URL ${url.href}`);
+    listed.add(url.href);
     if (url.pathname.endsWith('/404.html')) errors.push('404 page must not be in sitemap');
     const rel=decodeURIComponent(url.pathname.slice(siteUrl.pathname.length));
     const target=path.join(root,rel,url.pathname.endsWith('/')?'index.html':'');
@@ -58,3 +68,4 @@ for (const file of files.filter(f=>/sitemap-\d+\.xml$/.test(f))) {
 if (fs.existsSync(path.join(root,'tests')) || fs.existsSync(path.join(root,'scripts'))) errors.push('Development files copied to dist');
 if(errors.length){console.error(errors.slice(0,50).join('\n'));console.error(`${errors.length} errors`);process.exit(1);}
 console.log(`Validated ${pages.length} pages, ${links} internal links, scripts, canonical URLs and sitemap.`);
+
