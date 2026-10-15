@@ -90,3 +90,6 @@ Googleフォーム、GA4の名称・URL変更も実施したとの報告あり�
 このファイル、README.md、package.json、該当するAGENTS.mdを読み、最新コードと本番を確認してください。
 既存サイトの機能・公開先を維持して継続開発し、まず旧名称・旧URL・Instagram handleの残存とSearch Console関連の技術的問題を調べてください。
 外部への送信、資格・推薦の創作、根拠のない完了報告は行わず、実施内容・検証結果・残作業を日本語で示してください。
+
+## 移行時の追加保存
+上記の会話で生成した紹介画像は、移行時にJPEG形式で sns/instagram/oyanote-intro-renamed.jpg として同じリポジトリに保存しました。元のPNGは未保存ですが、投稿用画像はCodexから参照できます。Instagramへの投稿操作は未実施です。
