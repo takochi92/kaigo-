@@ -1,0 +1,57 @@
+name: Publish Instagram via Meta
+
+on:
+  schedule:
+    # GitHub schedules may start late; later runs recover when generation is delayed.
+    # All times are UTC. 01:00 UTC = 10:00 JST.
+    - cron: "2 1 * * *"
+    - cron: "20 1 * * *"
+    - cron: "0 2,3,6 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Validate today's package without publishing"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: instagram-pipeline
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: vars.IG_AUTOPUBLISH_ENABLED == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ccr-0d9e948d-9nfoh6
+      - uses: actions/checkout@v4
+        with:
+          ref: sns-auto
+          path: sns-auto
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Configure ledger identity
+        run: |
+          git -C sns-auto config user.name 'github-actions[bot]'
+          git -C sns-auto config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+      - name: Validate or publish today's package
+        env:
+          IG_AUTOPUBLISH_ENABLED: ${{ vars.IG_AUTOPUBLISH_ENABLED }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_TOKEN_ENCRYPTION_KEY: ${{ secrets.IG_TOKEN_ENCRYPTION_KEY }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            node scripts/publish-instagram.mjs --dry-run
+          else
+            node scripts/publish-instagram.mjs
+          fi

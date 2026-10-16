@@ -18,7 +18,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: daily-instagram
+  group: instagram-pipeline
   cancel-in-progress: false
 
 jobs:
