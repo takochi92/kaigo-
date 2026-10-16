@@ -4,7 +4,9 @@
 
 この仕組みは `IG_AUTOPUBLISH_ENABLED=true` にするまで動きません。2026-10-16現在、Metricool の当日12:00予約と既存の Codex 定期実行があるため、二重投稿を避けるためにも Meta 側の接続検証を終えてから切り替えます。**予約と公開は別です。**
 
-2026-10-16 12:00 JST の Metricool 投稿は `Published Post` と [Instagram の公開 URL](https://www.instagram.com/p/DeihWCoCr_L/) を確認しました。Meta アプリでは `instagram_business_basic` と `instagram_business_content_publish` が「テスト準備完了」です。@oyanote を Instagram テスターに追加しようとした際、Meta が「フォームを保存できません」と返したため、アクセストークン生成と GitHub Actions の有効化は未実施です。
+2026-10-16 12:00 JST の Metricool 投稿は `Published Post` と [Instagram の公開 URL](https://www.instagram.com/p/DeihWCoCr_L/) を確認しました。Meta アプリでは `instagram_business_basic` と `instagram_business_content_publish` が「テスト準備完了」です。@oyanote の Instagram テスター招待は送信済みで、Instagram 側の承認待ちです。アクセストークン生成と GitHub Actions の有効化は未実施です。
+
+10月17日10:00 JST の原稿と画像5枚は Metricool に自動公開で予備予約済み（予約 ID `397406163`、Instagram のみ、`PENDING`、`autoPublish=true`、`draft=false`）。Meta 経路を有効化する場合は、先にこの予約を取り消してから切り替えてください。予約は公開成功ではありません。
 
 GitHub Actions は日本時間10:02に最初の公開を試み、原稿生成や Actions 起動が遅れた場合は10:20、11:00、12:00、15:00に再確認します。GitHub のスケジュールは正確な時刻の実行を保証しません。投稿に失敗した場合は Actions の失敗として残り、公開要求の結果が不明なら自動再送を止めます。
 
