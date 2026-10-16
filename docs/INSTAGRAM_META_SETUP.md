@@ -4,11 +4,13 @@
 
 この仕組みは `IG_AUTOPUBLISH_ENABLED=true` にするまで動きません。2026-10-16現在、Metricool の当日12:00予約と既存の Codex 定期実行があるため、二重投稿を避けるためにも Meta 側の接続検証を終えてから切り替えます。**予約と公開は別です。**
 
+2026-10-16 12:00 JST の Metricool 投稿は `Published Post` と [Instagram の公開 URL](https://www.instagram.com/p/DeihWCoCr_L/) を確認しました。Meta アプリでは `instagram_business_basic` と `instagram_business_content_publish` が「テスト準備完了」です。@oyanote を Instagram テスターに追加しようとした際、Meta が「フォームを保存できません」と返したため、アクセストークン生成と GitHub Actions の有効化は未実施です。
+
 GitHub Actions は日本時間10:02に最初の公開を試み、原稿生成や Actions 起動が遅れた場合は10:20、11:00、12:00、15:00に再確認します。GitHub のスケジュールは正確な時刻の実行を保証しません。投稿に失敗した場合は Actions の失敗として残り、公開要求の結果が不明なら自動再送を止めます。
 
 ## 初回設定（所有者が行う）
 
-1. [Meta for Developers](https://developers.facebook.com/documentation/instagram-platform/create-an-instagram-app) で所有者のアプリを用意し、**Instagramログインを使った Instagram API** を選びます。@oyanote が Instagram プロアカウント（ビジネスまたはクリエイター）であることを確認します。
+1. [Meta for Developers](https://developers.facebook.com/apps/1566972251896103/dashboard/) の **Oyanote Auto Publisher**（Meta アプリ ID `1566972251896103`、Instagram アプリ ID `4077866365852062`）を使用します。2026-10-16 に Instagram ログインを使った Instagram API のユースケースで作成済みです。@oyanote が Instagram プロアカウントであることも画面で確認済みです。
 2. `instagram_business_basic` と `instagram_business_content_publish` の権限を @oyanote に付与し、長期間有効な Instagram ユーザーアクセストークンと Instagram ユーザー ID を取得します。認証画面で付与する範囲を確認してください。アクセストークンをチャット、issue、コミットに貼らないでください。
 3. この GitHub リポジトリの **Settings → Secrets and variables → Actions → Repository secrets** に `IG_USER_ID`、`IG_ACCESS_TOKEN`、`IG_TOKEN_ENCRYPTION_KEY` を登録します。最後の値は推測されにくい32文字以上のランダム文字列です。トークンは `sns-auto/instagram-token.enc.json` に AES-256-GCM で暗号化して保存し、7日ごとに更新します。鍵は GitHub Secret のみに保存します。
 4. Actions で **Publish Instagram via Meta** を `dry_run=true` で手動実行し、当日原稿・画像の検証が成功することを確認します。この実行では Instagram に送信しません。
