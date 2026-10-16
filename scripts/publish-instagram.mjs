@@ -103,7 +103,13 @@ async function ready(containerId, token) {
 async function main() {
   if (!dryRun && day < firstMetaDay) { console.log(`Meta publishing starts on ${firstMetaDay} JST`); return; }
   if (!enabled && !dryRun) { console.log('Instagram publishing is disabled'); return; }
-  if (!fs.existsSync(path.join(packageDir, 'post.json'))) { console.log(`Package for ${day} is not ready`); return; }
+  if (!fs.existsSync(path.join(packageDir, 'post.json'))) {
+    if (dryRun || new Date(Date.now() + 9 * 3600_000).getUTCHours() < 10) {
+      console.log(`Package for ${day} is not ready`);
+      return;
+    }
+    throw new Error(`Package for ${day} is missing after 10:00 JST`);
+  }
   const post = JSON.parse(fs.readFileSync(path.join(packageDir, 'post.json'), 'utf8'));
   if (post.date !== day || !post.caption?.trim() || !['article', 'terms', 'manga'].includes(post.kind) || !Array.isArray(post.images) || post.images.length < 1 || post.images.length > 10) throw new Error('Invalid post package');
   for (const image of post.images) {
