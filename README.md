@@ -52,7 +52,9 @@ Google検索に出すには、[Google Search Console](https://search.google.com/
 
 `content/manga-queue.mjs` に用意した7題は、`.github/workflows/weekly-manga.yml` が2026年10月18日から毎週日曜日03:00（日本時間）に1話ずつ公開します。画像・動画は続けて `refresh-sns.yml` で生成します。用意した題材が尽きたら自動生成は止まるため、内容を確認した新しい題材をキューに追加してください。
 
-Instagram @oyanote への登録は、Codex の「おやのて Instagram 毎日1件」定期実行が Metricool 連携を使い、`sns-auto` の画像と投稿文を確認してから行います。登録時は自動公開を指定し、同日の重複予約を避けます。GitHub Actions だけでは Metricool への投稿は行いません。
+2026年10月17日10:00の投稿は Metricool に自動公開で予約済みです。予約と公開は別の状態なので、当日の公開結果を確認します。
+
+10月18日以降に Meta API へ切り替えるための GitHub Actions は用意していますが、アクセストークンの発行と Secrets 登録、実際の公開テストが終わるまで無効です。切り替え条件と二重投稿防止策は [Instagram Meta API 設定手順](docs/INSTAGRAM_META_SETUP.md) を参照してください。切り替えまでは Codex の定期実行が Metricool を使い、`sns-auto` の原稿を検品・予約します。
 
 ## Claude の作業通知
 
