@@ -16,6 +16,7 @@ const initialToken = process.env.IG_ACCESS_TOKEN;
 const keyText = process.env.IG_TOKEN_ENCRYPTION_KEY;
 const enabled = process.env.IG_AUTOPUBLISH_ENABLED === 'true';
 const dryRun = process.argv.includes('--dry-run');
+const firstMetaDay = '2026-10-18';
 const jstDate = (value) => new Date(new Date(value).getTime() + 9 * 3600_000).toISOString().slice(0, 10);
 
 function gitSave(file, message) {
@@ -100,6 +101,7 @@ async function ready(containerId, token) {
 }
 
 async function main() {
+  if (!dryRun && day < firstMetaDay) { console.log(`Meta publishing starts on ${firstMetaDay} JST`); return; }
   if (!enabled && !dryRun) { console.log('Instagram publishing is disabled'); return; }
   if (!fs.existsSync(path.join(packageDir, 'post.json'))) { console.log(`Package for ${day} is not ready`); return; }
   const post = JSON.parse(fs.readFileSync(path.join(packageDir, 'post.json'), 'utf8'));
