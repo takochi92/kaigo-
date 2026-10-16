@@ -54,8 +54,6 @@ Google検索に出すには、[Google Search Console](https://search.google.com/
 
 Instagram @oyanote への登録は、Codex の「おやのて Instagram 毎日1件」定期実行が Metricool 連携を使い、`sns-auto` の画像と投稿文を確認してから行います。登録時は自動公開を指定し、同日の重複予約を避けます。GitHub Actions だけでは Metricool への投稿は行いません。
 
-ログイン状態に依存しない Meta 公式 API の公開処理は `.github/workflows/publish-instagram-meta.yml` と `scripts/publish-instagram.mjs` に用意しています。初期状態では無効です。Meta 認証・GitHub Secrets の登録と実公開テストを終えてから切り替えます。設定手順と二重投稿防止の注意は [docs/INSTAGRAM_META_SETUP.md](docs/INSTAGRAM_META_SETUP.md) を参照してください。
-
 ## Claude の作業通知
 
 Claude がコミットを push すると、`.github/workflows/claude-notify.yml` がスマホの ntfy アプリに通知します（Secrets の `NTFY_TOPIC` を設定したときだけ）。タスク・作成物・ツイートの一覧は非公開リポジトリ `claude-hub` にまとめています。
