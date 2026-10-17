@@ -115,7 +115,17 @@ async function main() {
   for (const image of post.images) {
     if (!/^\d{2}\.jpg$/.test(image) || !fs.existsSync(path.join(packageDir, image))) throw new Error(`Missing image ${image}`);
   }
-  if (dryRun) { console.log(`Validated ${day}: ${post.kind}, ${post.images.length} images`); return; }
+  if (dryRun) {
+    console.log(`Validated ${day}: ${post.kind}, ${post.images.length} images`);
+    // 読み取りだけでトークンと投稿先を確かめる（投稿・トークン更新はしない）
+    if (!userId || !initialToken) { console.log('Token check skipped: IG_USER_ID / IG_ACCESS_TOKEN not set'); return; }
+    if (keyText.length < 32) console.log('Warning: IG_TOKEN_ENCRYPTION_KEY is missing or shorter than 32 characters');
+    const account = await graph('/me?fields=id,username', decryptToken());
+    const ok = account.id === userId && account.username?.toLowerCase() === 'oyanote';
+    console.log(ok ? 'Token check: OK (@oyanote)' : `Token check: account mismatch (id match: ${account.id === userId}, username: ${account.username})`);
+    if (!ok) process.exitCode = 1;
+    return;
+  }
   if (!userId || !initialToken) throw new Error('Instagram account secrets are missing');
   const token = await maybeRefreshToken(decryptToken());
   const account = await graph('/me?fields=id,username', token);
