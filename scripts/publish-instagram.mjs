@@ -11,7 +11,9 @@ const packageDir = path.join(root, day);
 const ledgerFile = path.join(packageDir, 'instagram-published.json');
 const tokenFile = path.join(root, 'instagram-token.enc.json');
 const api = 'https://graph.instagram.com/v26.0';
-const userId = process.env.IG_USER_ID;
+const userId = (process.env.IG_USER_ID || '').trim();
+// Instagram ログインの API では /me の id はアプリ用の番号、user_id が 17841… のアカウント番号。どちらと一致してもよい
+const sameUser = (account) => [account.id, account.user_id].map(String).includes(userId);
 const initialToken = process.env.IG_ACCESS_TOKEN;
 const keyText = process.env.IG_TOKEN_ENCRYPTION_KEY;
 const enabled = process.env.IG_AUTOPUBLISH_ENABLED === 'true';
@@ -120,16 +122,16 @@ async function main() {
     // 読み取りだけでトークンと投稿先を確かめる（投稿・トークン更新はしない）
     if (!userId || !initialToken) { console.log('Token check skipped: IG_USER_ID / IG_ACCESS_TOKEN not set'); return; }
     if ((keyText || '').length < 32) console.log('Warning: IG_TOKEN_ENCRYPTION_KEY is missing or shorter than 32 characters');
-    const account = await graph('/me?fields=id,username', decryptToken());
-    const ok = account.id === userId && account.username?.toLowerCase() === 'oyanote';
-    console.log(ok ? 'Token check: OK (@oyanote)' : `Token check: account mismatch (id match: ${account.id === userId}, username: ${account.username})`);
+    const account = await graph('/me?fields=id,user_id,username', decryptToken());
+    const ok = sameUser(account) && account.username?.toLowerCase() === 'oyanote';
+    console.log(ok ? 'Token check: OK (@oyanote)' : `Token check: account mismatch (id match: ${sameUser(account)}, IG_USER_ID digits: ${userId.length}, username: ${account.username})`);
     if (!ok) process.exitCode = 1;
     return;
   }
   if (!userId || !initialToken) throw new Error('Instagram account secrets are missing');
   const token = await maybeRefreshToken(decryptToken());
-  const account = await graph('/me?fields=id,username', token);
-  if (account.id !== userId || account.username?.toLowerCase() !== 'oyanote') throw new Error('Instagram account does not match @oyanote');
+  const account = await graph('/me?fields=id,user_id,username', token);
+  if (!sameUser(account) || account.username?.toLowerCase() !== 'oyanote') throw new Error('Instagram account does not match @oyanote');
 
   const previous = fs.existsSync(ledgerFile) ? JSON.parse(fs.readFileSync(ledgerFile, 'utf8')) : null;
   if (previous?.state === 'published') {
