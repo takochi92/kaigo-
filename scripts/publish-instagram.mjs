@@ -119,7 +119,7 @@ async function main() {
     console.log(`Validated ${day}: ${post.kind}, ${post.images.length} images`);
     // 読み取りだけでトークンと投稿先を確かめる（投稿・トークン更新はしない）
     if (!userId || !initialToken) { console.log('Token check skipped: IG_USER_ID / IG_ACCESS_TOKEN not set'); return; }
-    if (keyText.length < 32) console.log('Warning: IG_TOKEN_ENCRYPTION_KEY is missing or shorter than 32 characters');
+    if ((keyText || '').length < 32) console.log('Warning: IG_TOKEN_ENCRYPTION_KEY is missing or shorter than 32 characters');
     const account = await graph('/me?fields=id,username', decryptToken());
     const ok = account.id === userId && account.username?.toLowerCase() === 'oyanote';
     console.log(ok ? 'Token check: OK (@oyanote)' : `Token check: account mismatch (id match: ${account.id === userId}, username: ${account.username})`);
