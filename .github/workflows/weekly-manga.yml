@@ -42,6 +42,12 @@ jobs:
           git pull --rebase origin ccr-0d9e948d-9nfoh6
           git push origin HEAD:ccr-0d9e948d-9nfoh6
           echo "released=true" >> "$GITHUB_OUTPUT"
+      # bot の push では Build and deploy が動かないので、ここで公開も起動する
+      - name: Publish the site
+        if: steps.release.outputs.released == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref ccr-0d9e948d-9nfoh6
       - name: Render Instagram images and videos
         if: steps.release.outputs.released == 'true'
         env:
