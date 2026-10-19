@@ -54,10 +54,40 @@ const mangaFor = (d) => {
   return index < 0 ? null : { kind: "manga", key: `manga-ep${index + 8}`, title: MANGA_QUEUE[index].title, episode: index + 8, item: MANGA_QUEUE[index] };
 };
 
+// 投稿文の最後に付ける「問いかけ」（日替わり）。短く答えられるものにする
+const QUESTIONS = {
+  article: [
+    "読んでみて、知らなかったことはありましたか？ ひとことでもコメントで教えてください",
+    "ご家族のことで、いま一番気になっていることは何ですか？ コメントで教えてください",
+    "このテーマで、もっと知りたいことはありますか？ コメントでリクエストどうぞ",
+    "同じような経験がある方、どうしましたか？ よければコメントで教えてください"
+  ],
+  terms: [
+    "この3つのうち、知らなかった言葉はありましたか？ 番号（1〜3）でコメントしてください",
+    "ほかに「よく聞くけど意味がわからない」介護の言葉はありますか？ コメントで教えてください",
+    "この中で、説明できる言葉はいくつありましたか？ 数字でコメントしてみてください"
+  ],
+  manga: [
+    "この話、身近に感じましたか？ 「ある」「ない」のひとことでもコメントで教えてください",
+    "次に読みたい話はありますか？ コメントでリクエストを送ってください。まんがにするかもしれません",
+    "ご家族で、同じようなことはありましたか？ よければコメントで教えてください"
+  ]
+};
+const questionFor = (kind, d) => { const q = QUESTIONS[kind]; return q ? q[((dayIndex(d) % q.length) + q.length) % q.length] : ""; };
+
+// 毎週水曜は「次のまんが、どれが読みたい？」のリクエスト募集（まだ出ていない話から3つ）
+const requestFor = (d) => {
+  if (new Date(d + "T00:00:00Z").getUTCDay() !== 3) return null;
+  const next = MANGA_QUEUE.map((m, i) => ({ ...m, date: mangaReleaseDate(i) })).filter((m) => m.date > d);
+  const options = next.slice(1, 4).length === 3 ? next.slice(1, 4) : next.slice(0, 3);
+  return options.length < 2 ? null : { kind: "request", key: "request-" + d, title: "リクエスト募集：次のまんが、どれが読みたい？", options };
+};
+const pickFor = (d) => mangaFor(d) || requestFor(d) || postFor(d);
+
 if (process.argv.includes("--list")) {
   for (let k = 0; k < PLAN.length; k++) {
     const d = new Date(Date.parse(DATE) + k * 86400e3).toISOString().slice(0, 10);
-    console.log(d, (mangaFor(d) || postFor(d)).title);
+    console.log(d, pickFor(d).title);
   }
   process.exit(0);
 }
@@ -101,6 +131,14 @@ function slidesFor(post) {
     <div class="desc">${text}</div>
     <div class="go">全国の介護事業所・病院の検索、相談窓口の探し方、まんがでわかる介護は<br><b>プロフィールのリンク（おやのて）</b>から見られます。</div>
     <div class="acc">おやのて oyanote-care.com ／ 編集部がやさしく解説</div></div></div>`;
+  if (post.kind === "request") {
+    const total = 3;
+    return [
+      `<div class="slide cover"><span class="tag">リクエスト募集</span><h1>次のまんが、<br>どれが読みたい？</h1><p class="sub">番号でコメントしてください。<br>いちばん多かった話を、先にまんがにします。</p><div class="who"><img src="assets/manga/musume.png" alt=""></div><span class="swipe">スワイプ →</span>${brand}</div>`,
+      `<div class="slide"><div class="bar"><span>番号でコメント</span><span class="n">2/${total}</span></div><div class="body"><h2>どれが読みたい？</h2>${post.options.map((o, i) => `<div class="pt"><b>${i + 1}</b><span><strong>${esc(o.title)}</strong><br><small>${esc(o.sub)}</small></span></div>`).join("")}<p class="desc" style="margin-top:auto">コメント欄に「1」「2」「3」の番号だけでOKです。</p></div></div>`,
+      `<div class="slide"><div class="bar"><span>あなたの声を聞かせてください</span><span class="n">3/${total}</span></div><div class="body"><h2>ほかのリクエストも大歓迎</h2><p class="desc">「こんな時どうしたら？」「この制度がわからない」など、知りたいことをコメントで教えてください。<br><br>コメントしにくい方は、サイトの<b>「ご意見・リクエスト」</b>からも送れます（名前なしでOK）。</p><div class="go">おやのては、介護で困っているご家族のためのサイトです。<br><b>プロフィールのリンク</b>から見られます。</div><div class="acc">おやのて oyanote-care.com</div></div></div>`
+    ];
+  }
   if (post.kind === "article") {
     const a = post.a, total = 3;
     return [
@@ -118,6 +156,16 @@ function slidesFor(post) {
 }
 
 function captionFor(post) {
+  if (post.kind === "request") {
+    return [
+      "【リクエスト募集】次のまんが、どれが読みたいですか？", "",
+      ...post.options.map((o, i) => `${i + 1}. ${o.title}（${o.sub}）`), "",
+      "コメント欄に番号（1〜3）だけ書いてください。いちばん多かった話を、先にまんがにします。", "",
+      "ほかにも「こんなとき、どうしたら？」「この制度がわからない」など、知りたいことがあればコメントで教えてください。",
+      "コメントしにくい方は、プロフィールのリンク（おやのて）の「ご意見・リクエスト」から、名前なしでも送れます。", "",
+      CONF.hashtags.article
+    ].join("\n");
+  }
   if (post.kind === "manga") {
     const article = ARTICLES.find((a) => a.slug === post.item.slug);
     return [
@@ -150,6 +198,7 @@ function captionFor(post) {
 // X 用（280 の重みで数える：全角2・半角1、URL は 23）
 const xLen = (t) => [...t.replace(/https?:\/\/\S+/g, "x".repeat(23))].reduce((n, c) => n + (c.charCodeAt(0) > 0x2ff ? 2 : 1), 0);
 function xFor(post) {
+  if (post.kind === "request") return `【リクエスト募集】次のまんが、どれが読みたい？\n${post.options.map((o, i) => `${i + 1}. ${o.title}`).join("\n")}\nInstagramのコメントで番号を教えてください\n${SITE}/manga.html\n#介護 #親の介護`;
   if (post.kind === "manga") return `まんがでわかる介護 第${post.episode}話「${post.title}」\n${SITE}/manga.html#ep${post.episode}\n#介護 #親の介護`;
   const tags = "#介護 #親の介護";
   const build = (lines) => lines.filter((l) => l !== null).join("\n");
@@ -168,7 +217,7 @@ function xFor(post) {
 }
 
 // ---- 作る ---------------------------------------------------------------------
-const post = mangaFor(DATE) || postFor(DATE);
+const post = pickFor(DATE);
 const dir = path.join(OUT, DATE);
 fs.mkdirSync(dir, { recursive: true });
 const files = [];
@@ -198,7 +247,13 @@ if (post.kind === "manga") {
   await browser.close();
 }
 
-const caption = captionFor(post);
+// 最後のハッシュタグ行の前に、日替わりの問いかけを入れる
+const caption = (() => {
+  const c = captionFor(post), q = questionFor(post.kind, DATE);
+  if (!q) return c;
+  const lines = c.split("\n"), tagAt = lines.length - 1;
+  return [...lines.slice(0, tagAt), "💬 " + q, "", lines[tagAt]].join("\n");
+})();
 fs.writeFileSync(path.join(dir, "caption.txt"), caption + "\n");
 const xText = xFor(post);
 fs.writeFileSync(path.join(dir, "x.txt"), xText + "\n");

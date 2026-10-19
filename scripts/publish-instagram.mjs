@@ -113,7 +113,7 @@ async function main() {
     throw new Error(`Package for ${day} is missing after 10:00 JST`);
   }
   const post = JSON.parse(fs.readFileSync(path.join(packageDir, 'post.json'), 'utf8'));
-  if (post.date !== day || !post.caption?.trim() || !['article', 'terms', 'manga'].includes(post.kind) || !Array.isArray(post.images) || post.images.length < 1 || post.images.length > 10) throw new Error('Invalid post package');
+  if (post.date !== day || !post.caption?.trim() || !['article', 'terms', 'manga', 'request'].includes(post.kind) || !Array.isArray(post.images) || post.images.length < 1 || post.images.length > 10) throw new Error('Invalid post package');
   for (const image of post.images) {
     if (!/^\d{2}\.jpg$/.test(image) || !fs.existsSync(path.join(packageDir, image))) throw new Error(`Missing image ${image}`);
   }

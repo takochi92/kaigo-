@@ -417,6 +417,8 @@ ${ep.panels.map((p, j) => panelHtml(p, j)).join("\n")}
     ${i < EPISODES.length - 1 ? `<p style="text-align:right"><a href="#${EPISODES[i + 1].id}">次の話：第${i + 2}話 ${esc(EPISODES[i + 1].title)} →</a></p>` : ""}
   </section>`).join("\n\n")}
 
+  <div class="voice"><strong>ご意見・リクエストをお待ちしています</strong><p>「次はこんな話が読みたい」「うちも同じだった」など、ひとことでも送ってください。名前なしでも送れます。いただいたリクエストから、次のまんがを決めています。</p><a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdJhFLMeFev3Il-ncBg1lLS5uhkh1U0EDWpnrQMb4zLgxcZWg/viewform" target="_blank" rel="noopener">ご意見・リクエストを送る</a></div>
+
   <p class="note">まんがは一般的な例です。使えるサービスや手続きは、要介護度・地域・家族の状況によって変わります。くわしくは地域包括支援センターやケアマネジャーにご相談ください。</p>
 </main>
 

@@ -63,6 +63,7 @@ for (const a of ARTICLES) {
   <h2>参考資料・制度の確認先</h2><ul>${(ARTICLE_SOURCES[a.slug] || []).map(([label, url]) => `<li><a href="${esc(url)}">${esc(label)}</a></li>`).join("")}</ul><p class="small muted">対象条件や手続きは、上記の資料とお住まいの自治体・担当者に確認してください。</p>
   ${a.links?.length ? `<h2>関連ページ</h2><div class="btn-row">${a.links.map(([t, h]) => `<a class="btn secondary" href="${rel(h, up)}">${esc(t)}</a>`).join("")}</div>` : ""}
   ${related.length ? `<h2>同じテーマの読みもの</h2><ul>${related.map((b) => `<li><a href="${b.slug}.html">${esc(b.title)}</a></li>`).join("")}</ul>` : ""}
+  <div class="voice"><strong>ご意見・リクエストをお待ちしています</strong><p>「ここがわかりにくい」「こんなことも知りたい」など、ひとことでも送ってください。名前なしでも送れます。いただいた声をもとに、記事やまんがを増やしています。</p><a class="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdJhFLMeFev3Il-ncBg1lLS5uhkh1U0EDWpnrQMb4zLgxcZWg/viewform" target="_blank" rel="noopener">ご意見・リクエストを送る</a></div>
   <p class="note">この記事は一般的な解説です。制度や手続きは自治体や状況によって異なることがあります。具体的なことは、地域包括支援センター・ケアマネジャー・主治医などにご相談ください。わからない言葉は<a href="${up}yougo.html">用語集</a>で調べられます。</p>
 </main>`;
   fs.writeFileSync(path.join(ROOT, "yomimono", `${a.slug}.html`), page({
