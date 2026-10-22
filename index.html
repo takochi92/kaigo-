@@ -12,16 +12,29 @@
 <header id="site-header"></header>
 
 <main class="wrap">
-  <section class="hero">
-    <h1>お母さん、どうしよう？と思ったら</h1>
-    <p>介護の知識がなくても大丈夫。今の状況から、まずすることと相談先が分かります。</p>
-    <p style="margin-top:10px"><a class="btn" href="tsugi.html">今の状況から次にすることを見る</a> <a class="btn secondary" href="first-7days.html">介護が初めての家族へ</a></p>
+  <section class="home-hero" aria-labelledby="home-title">
+    <div class="home-hero-copy">
+      <p class="home-kicker">介護のこと、何も知らなくても大丈夫</p>
+      <h1 id="home-title">お母さん、どうしよう？<br>と思ったら。</h1>
+      <p>まずは、いま困っていることをひとつ選んでください。</p>
+      <a class="btn home-start" href="first-7days.html">最初にすることを見る <span aria-hidden="true">→</span></a>
+    </div>
+    <img class="home-hero-art" src="assets/manga/musume-worry.png" alt="母親のことで心配している家族のイラスト">
   </section>
 
-  <div class="grid" aria-label="まず困っていることから">
-    <a class="card" href="first-7days.html"><span class="icon" aria-hidden="true">☎</span><h2 style="margin:0 0 6px;font-size:1.08rem">介護が初めてで、何も分からない</h2><p class="muted small" style="margin:0">今日すること、相談窓口への伝え方、最初の1週間の目安。</p></a>
-    <a class="card" href="yomimono/taiin-sheet.html"><span class="icon" aria-hidden="true">□</span><h2 style="margin:0 0 6px;font-size:1.08rem">お母さんの退院が決まった</h2><p class="muted small" style="margin:0">病院で聞くことを整理した、印刷して使える準備シート。</p></a>
-  </div>
+  <section class="home-choices" aria-labelledby="choices-title">
+    <h2 id="choices-title">いまの状況はどれですか？</h2>
+    <div class="home-choice-grid">
+      <a class="home-choice choice-worry" href="first-7days.html"><span class="choice-icon" aria-hidden="true">？</span><span class="choice-label">急に母の様子が心配</span><span class="choice-arrow" aria-hidden="true">›</span></a>
+      <a class="home-choice choice-hospital" href="yomimono/taiin-sheet.html"><span class="choice-icon" aria-hidden="true">＋</span><span class="choice-label">退院が近い・決まった</span><span class="choice-arrow" aria-hidden="true">›</span></a>
+      <a class="home-choice choice-talk" href="shisetsu.html"><span class="choice-icon" aria-hidden="true">☎</span><span class="choice-label">誰に相談したらいい？</span><span class="choice-arrow" aria-hidden="true">›</span></a>
+      <a class="home-choice choice-manga" href="manga.html"><span class="choice-icon" aria-hidden="true">▤</span><span class="choice-label">まず漫画で流れを知りたい</span><span class="choice-arrow" aria-hidden="true">›</span></a>
+    </div>
+    <p class="home-reassure"><span aria-hidden="true">●</span> まだ決まっていなくても大丈夫。相談しながら一緒に考えられます。</p>
+  </section>
+
+  <details class="home-more">
+    <summary>事業所・病院・制度など、目的から探す</summary>
   <nav class="tiles" aria-label="大項目">
     <a class="tile find" href="search.html"><strong>介護事業所を探す</strong><span>ケアマネ・訪問介護・デイ・特養など</span></a>
     <a class="tile find" href="search.html?cat=byoin"><strong>病院・診療所を探す</strong><span>病院・クリニック・歯科</span></a>
@@ -32,7 +45,10 @@
     <a class="tile" href="faq.html"><strong>よくある質問</strong><span>費用・入所・仕事との両立</span></a>
     <a class="tile" href="jigyo.html"><strong>事業者向け</strong><span>指定要件・開業の流れ</span></a>
   </nav>
+  </details>
 
+  <details class="home-more">
+    <summary>地域・検索・便利な道具を使う</summary>
   <form class="quick" id="quick" onsubmit="return false">
     <label for="quick-pref">地域から探す</label>
     <select id="quick-pref"><option value="">都道府県を選ぶ</option></select>
@@ -46,7 +62,10 @@
     <a class="card" href="kengaku.html"><h3 style="margin:0 0 4px">施設見学チェックリスト</h3><p class="muted small" style="margin:0">費用・医療・職員・食事・退去の条件を、見学しながらチェック。</p></a>
     <a class="card" href="yougo.html"><h3 style="margin:0 0 4px">介護・医療の用語集</h3><p class="muted small" style="margin:0">ケアプラン、ADL、胃ろう、ACP…わからない言葉を調べる。</p></a>
   </div>
+  </details>
 
+  <details class="home-more">
+  <summary>介護サービスを使うまでの流れを見る</summary>
   <h2 id="flow">はじめての方へ：介護サービスを使うまでの流れ</h2>
   <ol class="steps">
     <li><strong>相談する</strong><br>お住まいの地域の<a href="shisetsu.html">地域包括支援センター</a>か、市区町村の介護保険担当窓口に相談します。相談は無料です。</li>
@@ -57,7 +76,10 @@
     <li><strong>サービスの利用開始</strong><br>事業所と契約し、デイサービス・ホームヘルプ・施設入所などを利用します。費用は原則1割（所得により2〜3割）です。</li>
   </ol>
   <p class="btn-row"><a class="btn" href="manga.html">まんがで流れを見る</a><a class="btn secondary" href="seido.html#flow">申請の流れをくわしく見る</a></p>
+  </details>
 
+  <details class="home-more">
+  <summary>読みもの・便利な道具を開く</summary>
   <h2>読みもの</h2>
   <ul>
     <li><a href="yomimono/houkatsu.html">地域包括支援センターって何をしてくれるの？</a></li>
@@ -67,7 +89,10 @@
     <li><a href="yomimono/tokuyo.html">特養の申し込み方と、待っている間にできること</a></li>
   </ul>
   <p class="btn-row"><a class="btn secondary" href="yomimono/index.html">読みものをすべて見る</a><a class="btn secondary" href="yougo.html">介護・医療の用語集</a></p>
+  </details>
 
+  <details class="home-more">
+  <summary>地域から事業所や連絡先を探す</summary>
   <h2>都道府県から探す</h2>
   <div class="chips" id="pref-links"></div>
 
@@ -92,6 +117,7 @@
     このサイトは一般的な情報をまとめたものです。制度の細かい扱いは自治体ごとに異なることがあります。必ず市区町村や専門職に確認してください。
   </div>
 <h2>紹介・配布に使いたい方へ</h2><p>地域包括支援センター・医療機関・介護事業所の皆さまへ。相談時に役立つページと、QRコード付きのチラシをご用意しています。</p><p><a class="btn secondary" href="share.html">ご紹介・チラシ配布について</a></p>
+  </details>
 </main>
 
 <footer id="site-footer"></footer>

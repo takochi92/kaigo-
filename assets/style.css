@@ -144,6 +144,52 @@ p { margin: 0 0 14px; }
 .muted { color: var(--muted); }
 .small { font-size: .86rem; }
 
+/* トップ：文章を読み込む前に、自分の状況から選べる入口を見せる */
+.home-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  align-items: center;
+  min-height: 230px;
+  overflow: hidden;
+  padding: 24px 34px;
+  margin: 0 0 22px;
+  background: linear-gradient(115deg, #f2f7e9 0%, #f7f8f2 72%, #fff3e8 100%);
+  border-bottom: 4px solid var(--leaf);
+}
+.home-hero-copy { position: relative; z-index: 1; }
+.home-kicker { margin: 0 0 8px; color: var(--primary); font-size: .9rem; font-weight: 800; letter-spacing: .04em; }
+.home-hero h1 { margin: 0 0 8px; font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.3; }
+.home-hero-copy > p:not(.home-kicker) { margin-bottom: 16px; color: var(--muted); }
+.home-hero-art { align-self: end; justify-self: center; width: auto; height: 220px; max-width: 100%; object-fit: contain; object-position: bottom; }
+.home-start { min-height: 50px; padding: 10px 20px; font-size: 1.03rem; }
+.home-start span { display: inline-block; margin-left: 12px; font-size: 1.2em; }
+.home-choices { margin: 0 0 22px; }
+.home-choices > h2 { margin: 0 0 12px; padding: 0; border: 0; font-size: 1.25rem; }
+.home-choice-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.home-choice { display: grid; grid-template-columns: 48px minmax(0,1fr) 18px; align-items: center; gap: 10px; min-height: 92px; padding: 14px; border: 1px solid var(--line); border-bottom: 4px solid var(--leaf); background: #fff; color: var(--text); text-decoration: none; transition: transform .15s, box-shadow .15s; }
+.home-choice:hover { transform: translateY(-2px); box-shadow: 0 5px 16px #2b302718; }
+.choice-worry { border-bottom-color: #e6a438; }
+.choice-hospital { border-bottom-color: #6b9ac4; }
+.choice-talk { border-bottom-color: #6caa78; }
+.choice-manga { border-bottom-color: #ad8ac7; }
+.choice-icon { display: grid; place-items: center; width: 46px; height: 46px; background: var(--primary-soft); color: var(--primary); font-size: 1.55rem; font-weight: 800; }
+.choice-hospital .choice-icon { background: #edf4fb; color: #477cae; }
+.choice-talk .choice-icon { background: #edf6ed; color: #43834f; }
+.choice-manga .choice-icon { background: #f4eff8; color: #825d9f; }
+.choice-label { font-size: 1rem; font-weight: 800; line-height: 1.4; }
+.choice-arrow { color: var(--primary); font-size: 1.7rem; text-align: right; }
+.home-reassure { margin: 12px 2px 0; color: var(--muted); font-size: .91rem; }
+.home-reassure span { color: var(--leaf); font-size: .75rem; }
+.home-more { margin: 0 0 10px; border: 1px solid var(--line); background: #fff; }
+.home-more > summary { position: relative; list-style: none; cursor: pointer; padding: 13px 44px 13px 16px; color: var(--text); font-weight: 700; }
+.home-more > summary::-webkit-details-marker { display: none; }
+.home-more > summary::after { content: "+"; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--primary); font-size: 1.35rem; }
+.home-more[open] > summary { border-bottom: 1px solid var(--line); background: var(--surface-2); }
+.home-more[open] > summary::after { content: "−"; }
+.home-more > :not(summary) { margin-left: 16px; margin-right: 16px; }
+.home-more > h2 { margin-top: 22px; }
+
 .hero {
   background: var(--primary-soft);
   border-left: 6px solid var(--leaf);
@@ -425,6 +471,19 @@ a.chip { text-decoration: none; display: inline-block; }
   .tile { padding: 10px 12px 12px; }
   .tile strong { font-size: .95rem; }
   .tile span { font-size: .74rem; }
+  .home-hero { grid-template-columns: minmax(0, 1fr) 90px; min-height: 180px; padding: 18px 14px; margin-bottom: 18px; }
+  .home-hero-art { height: 150px; max-width: 110px; }
+  .home-kicker { font-size: .77rem; }
+  .home-hero h1 { font-size: 1.55rem; }
+  .home-hero-copy > p:not(.home-kicker) { font-size: .88rem; line-height: 1.5; }
+  .home-start { min-height: 44px; padding: 8px 12px; font-size: .92rem; }
+  .home-start span { margin-left: 4px; }
+  .home-choice-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .home-choice { grid-template-columns: 38px minmax(0,1fr) 12px; gap: 7px; min-height: 76px; padding: 9px 8px; }
+  .choice-icon { width: 36px; height: 36px; font-size: 1.25rem; }
+  .choice-label { font-size: .87rem; }
+  .choice-arrow { font-size: 1.35rem; }
+  .home-reassure { font-size: .82rem; line-height: 1.5; }
 }
 
 /* 市区町村ページの折りたたみ */
