@@ -7,6 +7,7 @@
 
   var pages = [
     ["index.html", "トップ"],
+    ["first-7days.html", "介護が初めての方へ"],
     ["search.html", "事業所・病院検索"],
     ["manga.html", "まんがでわかる"],
     ["yomimono/index.html", "読みもの"],

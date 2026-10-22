@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>お母さんの退院準備シート｜家族が病院で確認すること｜おやのて</title>
+<meta name="description" content="お母さんの退院が決まったとき、家族が病院や相談員に確認することを一枚に整理。専門用語が分からなくても使える、印刷用の退院準備シートです。">
+<link rel="canonical" href="https://oyanote-care.com/yomimono/taiin-sheet.html">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.taiin-sheet { max-width: 48em; }
+.sheet-checks { padding-left: 1.3em; }
+.sheet-checks li { margin: 5px 0; }
+.write-line { display: block; min-height: 1.8em; border-bottom: 1px solid #777; margin: 2px 0 8px; }
+.sheet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 22px; }
+@media (max-width: 600px) { .sheet-grid { grid-template-columns: 1fr; } }
+@media print {
+  @page { size: A4 portrait; margin: 13mm; }
+  body.printing .site-header, body.printing .urgent, body.printing .site-footer,
+  body.printing .print-hide, body.printing .taiin-sheet > :not(#print-sheet) { display: none !important; }
+  body.printing main { display: block !important; max-width: none !important; padding: 0 !important; }
+  body.printing #print-sheet { display: block !important; border: 0 !important; padding: 0 !important; margin: 0 !important; }
+  body.printing #print-sheet h1 { font-size: 18pt; }
+  body.printing #print-sheet h2 { font-size: 12pt; margin: 12px 0 5px; }
+  body.printing #print-sheet p, body.printing #print-sheet li { font-size: 10pt; line-height: 1.45; }
+  body.printing #print-sheet .write-line { min-height: 1.35em; margin-bottom: 4px; }
+  body.printing #print-sheet .sheet-checks { margin: 4px 0; }
+}
+</style>
+</head>
+<body>
+<header id="site-header"></header>
+<main class="wrap taiin-sheet">
+  <div class="print-hide">
+    <p class="small muted"><a href="../index.html">トップ</a> › <a href="index.html">読みもの</a> › 退院の準備</p>
+    <h1>お母さんの退院準備シート</h1>
+    <p class="lead">「退院が決まったけれど、家で大丈夫？」と不安な家族へ。全部決めてから病院に行かなくて大丈夫です。この紙を見ながら、相談員や看護師に聞いてみましょう。</p>
+    <p><button class="btn" id="print-button" type="button">退院準備シートを印刷する</button></p>
+    <div class="tip"><strong>まず病院にこう伝えてください</strong><br>「退院後、家でどんな手助けが必要か分からず不安です。相談できる方につないでもらえますか？」<br>「家族だけで相談してもいいですか？」</div>
+    <p>病院の相談室の名前が分からなくても、病棟の看護師に「退院後のことを相談したい」と伝えれば案内してもらえます。</p>
+  </div>
+  <section class="card print-sheet" id="print-sheet" aria-labelledby="sheet-title">
+    <h1 id="sheet-title">お母さんの退院準備シート</h1>
+    <p>分かるところだけ記入してください。空欄があっても、そのまま相談できます。</p>
+    <div class="sheet-grid"><div>退院予定日<span class="write-line"></span></div><div>病院・病棟<span class="write-line"></span></div></div>
+    <h2>まず相談員・看護師に伝えること</h2>
+    <ul class="sheet-checks">
+      <li>家に帰った後の生活が不安です。退院後に必要な手助けを一緒に考えてください。</li>
+      <li>家族が手伝える曜日・時間：<span class="write-line"></span></li>
+      <li>家で困りそうなこと（歩く、トイレ、食事、薬、お風呂など）：<span class="write-line"></span></li>
+    </ul>
+    <h2>退院前に確認したいこと</h2>
+    <ul class="sheet-checks">
+      <li>□ 家に帰った後、どんな手助けが必要か</li>
+      <li>□ 薬の飲み方・次の受診日・体調が悪くなったときの連絡先</li>
+      <li>□ 食事や飲み込み、入浴、トイレ、歩くときの注意</li>
+      <li>□ 家で医療の手助けが必要か（必要なら、誰に相談するか）</li>
+      <li>□ ベッドや手すりなど、退院日までに準備するもの</li>
+      <li>□ 退院前に病院・家族・支援者で話す機会を作れるか</li>
+      <li>□ 家に帰る準備が間に合わない場合、ほかの行き先を相談できるか</li>
+    </ul>
+    <h2>聞いたこと・次にすること</h2>
+    <div>相談した相手・連絡先<span class="write-line"></span></div>
+    <div>家族で確認したいこと<span class="write-line"></span><span class="write-line"></span></div>
+    <div>次にすること・いつまでに<span class="write-line"></span><span class="write-line"></span></div>
+    <p class="small">介護保険の申請、ケアマネジャー、訪問看護などの手配は、病院の相談室や地域包括支援センターに相談できます。サービスや手続きは本人の状態・地域で異なります。</p>
+    <p class="small">おやのて｜退院後の準備の詳しい案内：oyanote-care.com/yomimono/taiin.html</p>
+  </section>
+  <div class="print-hide">
+    <p class="note small">入力欄はなく、書いた内容がサイトに送信されたり保存されたりすることはありません。印刷せずに画面を見ながら使うこともできます。</p>
+    <div class="btn-row"><a class="btn secondary" href="taiin.html">退院までにすることを詳しく読む</a><a class="btn secondary" href="../first-7days.html">介護が初めての家族へ：最初の7日</a><a class="btn secondary" href="../shisetsu.html">相談窓口を探す</a></div>
+  </div>
+</main>
+<footer id="site-footer"></footer>
+<script src="../assets/main.js"></script>
+<script>
+document.getElementById("print-button").addEventListener("click", function () {
+  document.body.classList.add("printing");
+  window.print();
+});
+window.addEventListener("afterprint", function () {
+  document.body.classList.remove("printing");
+});
+</script>
+</body>
+</html>

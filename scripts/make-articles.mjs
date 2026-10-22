@@ -17,7 +17,8 @@ const catName = Object.fromEntries(CATEGORIES);
 
 // 手書きの記事（一覧に載せるだけ）
 const HANDWRITTEN = [
-  { slug: "taiin", cat: "zaitaku", date: "2026-10-08", title: "親が退院することになったら｜家に帰る前にやること", lead: "相談先、介護保険の申請、退院前の打ち合わせ、家の準備、チェックリスト。" }
+  { slug: "taiin", cat: "zaitaku", date: "2026-10-08", title: "親が退院することになったら｜家に帰る前にやること", lead: "相談先、介護保険の申請、退院前の打ち合わせ、家の準備、チェックリスト。" },
+  { slug: "taiin-sheet", cat: "zaitaku", date: "2026-10-22", title: "お母さんの退院準備シート｜家族が病院で確認すること", lead: "退院前に病院へ聞きたいことを、一枚に整理。印刷して家族や相談員との話し合いに使えます。" }
 ];
 
 const rel = (html, up) => html.replace(/@\//g, up);

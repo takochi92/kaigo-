@@ -247,6 +247,15 @@ a.card:hover { border-color: var(--primary); }
   margin: 16px 0;
 }
 
+.call-script {
+  margin: 8px 0;
+  padding: 12px 14px;
+  background: #fff;
+  border-left: 4px solid var(--accent);
+  font-weight: 700;
+}
+.write-line { display: inline-block; min-width: 8em; min-height: 1.4em; border-bottom: 1px solid #777; vertical-align: bottom; }
+.print-sheet { border: 1px solid var(--line); padding: 16px; margin: 20px 0; background: #fff; }
 /* ---------- 表 ---------- */
 .table-wrap { overflow-x: auto; margin: 10px 0 18px; border: 1px solid var(--line); border-radius: 0; }
 table { border-collapse: collapse; width: 100%; background: var(--surface); font-size: .94rem; }
@@ -398,6 +407,10 @@ a.chip { text-decoration: none; display: inline-block; }
 @media print {
   .site-header, .urgent, .site-footer, .nav-toggle, .chat-form { display: none !important; }
   body { background: #fff; color: #000; }
+  body.printing .first-week > :not(.print-sheet) { display: none !important; }
+  body.printing .first-week .print-hide { display: none !important; }
+  body.printing .first-week { max-width: none !important; padding: 0 !important; }
+  body.printing .print-sheet { display: block !important; border: 0; padding: 0; margin: 0; }
 }
 
 [hidden] { display: none !important; }
